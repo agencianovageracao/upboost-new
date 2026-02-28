@@ -81,7 +81,7 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
                 width={logo}
                 height={logo}
                 className='pointer-events-none select-none object-contain'
-                style={{ rotate: -rotate }}
+                style={{ rotate: -rotate as any }}
               />
             </motion.div>
           </motion.div>
