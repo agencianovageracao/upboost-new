@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 10%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 389%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0, 100%, 50%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 223, 30%, 24%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 223, 17%, 37%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 50, 100%, 50%;
+    --chart-2: 50, 100%, 50%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-theme-900 text-white;
+
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+}
+
+.svg path {
+  stroke-width: 2px !important;
+  stroke: #0c1019;
+  fill: transparent;
+  transition: 0.7s ease;
+  animation: svgAnimation 6s ease infinite alternate;
+}
+
+.fill-bg {
+  animation: fillBg 2s forwards;
+  animation-delay: 2s;
+}
+
+@keyframes svgAnimation {
+  0% {
+    stroke-width: 2px;
+    stroke-dasharray: 200 400;
+    fill: transparent;
+  }
+  25% {
+    stroke-width: 2px;
+    fill: transparent;
+  }
+  60%,
+  100% {
+    stroke-width: 2px;
+    stroke-dasharray: 500 200;
+    stroke-dashoffset: 1000;
+    fill: #0c1019;
+  }
+}
+
+@keyframes fillBg {
+  0% {
+    width: 100vw;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+.faq-trigger > .chevron > .icon {
+  transition: all 0.2s ease;
+}
+
+.faq-trigger[data-state='open'] > .chevron > .icon {
+  transform: rotate(135deg);
+}
+
+.faq-content {
+  overflow: hidden;
+}
+.faq-content[data-state='open'] {
+  animation: slideDown 300ms ease-out;
+}
+.faq-content[data-state='closed'] {
+  animation: slideUp 300ms ease-out;
+}
+
+.loading-icon {
+  animation: spin 0.5s linear infinite;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 20px !important;
+  background-color: #1e263b;
+
+  @apply bg-theme-700;
+}
+
+&::-webkit-scrollbar-thumb {
+  border-radius: 20px !important;
+  background-color: #ffd300;
+
+  @apply bg-theme-400;
+}
+
+&::-webkit-scrollbar-button {
+  height: 0;
+  width: 0;
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
