@@ -41,7 +41,6 @@
     @apply bg-theme-900 text-white;
 
     overflow-x: hidden;
-    scroll-behavior: smooth;
   }
 }
 
@@ -86,23 +85,6 @@
   }
 }
 
-.faq-trigger > .chevron > .icon {
-  transition: all 0.2s ease;
-}
-
-.faq-trigger[data-state='open'] > .chevron > .icon {
-  transform: rotate(135deg);
-}
-
-.faq-content {
-  overflow: hidden;
-}
-.faq-content[data-state='open'] {
-  animation: slideDown 300ms ease-out;
-}
-.faq-content[data-state='closed'] {
-  animation: slideUp 300ms ease-out;
-}
 
 .loading-icon {
   animation: spin 0.5s linear infinite;

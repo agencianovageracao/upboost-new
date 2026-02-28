@@ -1,82 +1,73 @@
-import { Title } from '@/components/globals/site/Title';
-import Marquee from '@/components/magicui/marquee';
-import { motion } from 'framer-motion';
+'use client';
 
-const reviews = [
+import { cn } from '@/lib/utils';
+import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { useRef } from 'react';
+
+export const reviews = [
   {
     name: '@danielrocha',
-    body: 'Po mano trabalho sensacional, joguei uma aqui de valorant senti menos input e muito mais estabilidade meu Pc já não é aqueles do melhores posso dizer q vc milagre mano valeu',
+    body: 'Trabalho sensacional, senti menos input e muito mais estabilidade. Meu PC já não é dos melhores e você fez milagre mano.',
   },
   {
     name: '@gvzin',
-    body: '360 fps. Cai pra 330 fps, não desce, eu jurei q isso não ia funcionar, tô a 215 fps no warzone, obrigado mano.',
+    body: '360 FPS. Cai pra 330, não desce. Eu jurei que isso não ia funcionar. Tô a 215 FPS no Warzone agora.',
   },
   {
     name: '@varelaxlz_',
-    body: 'Muito bom mano. Tô rodando liso pra caramba, no criativo rodava 144 e agr tô 240. Na partida meu fps dropava muito e agora tá muito mais cravado.',
+    body: 'No criativo rodava 144 e agora tô 240. Na partida meu FPS dropava muito e agora tá muito mais cravado.',
   },
   {
     name: '@gbtns',
-    body: 'Caraa, 180 FPS cravados, ficou top demais, o do meu irmão também um i3 8100 GTX 1050 144 fps cravado.',
+    body: '180 FPS cravados. Ficou top demais. O do meu irmão também, um i3 8100 + GTX 1050, 144 FPS cravado.',
   },
   {
     name: '@felps.gma',
-    body: 'Tá aí irmão, parabéns. Jogo melhorou 100%, sem input, 200 fps cravado',
+    body: 'Jogo melhorou 100%. Sem input, 200 FPS cravado. Parabéns.',
   },
   {
     name: '@l3ocampos',
-    body: 'Eu não tava botando fé que ia funcionar não kkkkkk. Acabou as quedas de fps total.',
+    body: 'Eu não tava botando fé que ia funcionar. Acabou as quedas de FPS total.',
   },
 ];
 
-const firstRow = reviews.slice(0, reviews.length / 2);
-const secondRow = reviews.slice(reviews.length / 2);
+export const ReviewCard = ({ name, body, className }: { name: string; body: string; className?: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(-999);
+  const mouseY = useMotionValue(-999);
+  const glow = useMotionTemplate`radial-gradient(130px circle at ${mouseX}px ${mouseY}px, rgba(255,211,0,0.07), transparent 80%)`;
+  const initial = name.replace('@', '')[0]?.toUpperCase() ?? '?';
 
-export const Testimonials = () => {
   return (
-    <>
-      <Marquee vertical className='items-center [--duration:20s] [--gap:20px]'>
-        {firstRow.map((review, index) => {
-          return (
-            <div
-              className='flex max-w-[250px] flex-col justify-center rounded-lg bg-theme-800 p-5 text-left shadow-sm shadow-theme-400/20'
-              key={index}
-            >
-              <h1 className='font-sora text-2xl font-bold text-theme-400'>
-                {review.name}
-              </h1>
-              <p className='mt-2 text-sm'>&ldquo;{review.body}&rdquo;</p>
-            </div>
-          );
-        })}
-      </Marquee>
-      <Marquee
-        vertical
-        reverse
-        className='items-center [--duration:20s] [--gap:20px]'
-      >
-        {secondRow.map((review, index) => {
-          return (
-            <div
-              className='flex max-w-[250px] flex-col justify-center rounded-lg bg-theme-800 p-5 text-left shadow-sm shadow-theme-400/20'
-              key={index}
-            >
-              <h1 className='font-sora text-2xl font-bold text-theme-400'>
-                {review.name}
-              </h1>
-              <p className='mt-2 text-sm'>&ldquo;{review.body}&rdquo;</p>
-            </div>
-          );
-        })}
-      </Marquee>
-      <div className='pointer-events-none absolute top-0 left-0 right-0 h-32 w-full bg-gradient-to-b from-theme-800 via-theme-800/95 to-transparent'></div>
-      <div className='pointer-events-none absolute top-[630px] left-0 right-0 h-32 w-full bg-gradient-to-t from-theme-800 via-theme-800/95 to-transparent'></div>
-      <motion.div
-        initial={{ width: '0%' }}
-        animate={{ width: '100%' }}
-        transition={{ duration: 1.5, ease: 'easeInOut' }}
-        className='absolute bottom-0 left-1/2 h-px -translate-x-1/2 bg-gradient-to-r from-transparent via-theme-400/20 to-transparent'
-      ></motion.div>
-    </>
+    <motion.div
+      ref={ref}
+      onMouseMove={e => {
+        const r = ref.current?.getBoundingClientRect();
+        if (r) { mouseX.set(e.clientX - r.left); mouseY.set(e.clientY - r.top); }
+      }}
+      onMouseLeave={() => { mouseX.set(-999); mouseY.set(-999); }}
+      whileHover={{ borderColor: 'rgba(255,211,0,0.18)', y: -2 }}
+      transition={{ duration: 0.2 }}
+      className={cn(
+        'relative cursor-default overflow-hidden rounded-2xl border border-white/8 bg-theme-800 p-4 flex flex-col gap-3',
+        className
+      )}
+    >
+      <motion.div aria-hidden className='pointer-events-none absolute inset-0' style={{ background: glow }} />
+
+      {/* Header */}
+      <div className='relative z-10 flex items-center justify-between'>
+        <div className='flex items-center gap-2'>
+          <div className='flex h-7 w-7 items-center justify-center rounded-full border border-theme-400/25 bg-theme-400/10'>
+            <span className='font-sora text-[10px] font-bold text-theme-400'>{initial}</span>
+          </div>
+          <span className='font-sora text-xs font-semibold text-white'>{name}</span>
+        </div>
+        <span className='text-[10px] text-theme-400'>★★★★★</span>
+      </div>
+
+      {/* Quote */}
+      <p className='relative z-10 text-[11px] leading-relaxed text-neutral-400'>&ldquo;{body}&rdquo;</p>
+    </motion.div>
   );
 };

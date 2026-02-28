@@ -1,12 +1,10 @@
 'use client';
 
-import { Navbar } from '@/components/globals/site/Navbar';
 import { ShinyDefaultButton } from '@/components/globals/site/ShinyDefaultButton';
 import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 const floatingLogos = [
   { item: 'cs2',      ext: 'png',  pos: 'top-[22%]    left-[14%]', rotate: -7,  card: 86, logo: 52, delay: 0   },
@@ -20,28 +18,9 @@ const floatingLogos = [
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export const Header = ({ loaded }: { loaded: boolean }) => {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   return (
     <>
-      {/* ── Fixed navbar ── */}
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={loaded ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }}
-        transition={{ duration: 0.5, ease, delay: 0 }}
-        className={`fixed left-0 right-0 top-0 z-50 py-5 transition-colors duration-300 ${
-          scrolled ? 'border-b border-white/5 bg-theme-900/75 backdrop-blur-xl' : ''
-        }`}
-      >
-        <Navbar />
-      </motion.div>
-
       <header className='relative bg-theme-900' style={{ paddingTop: 95 }}>
         {/* Subtle center glow */}
         <div

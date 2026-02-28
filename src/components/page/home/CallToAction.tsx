@@ -1,156 +1,278 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { Cpu, Globe, Monitor, ShoppingCart, Wifi, Zap } from 'lucide-react';
 import Link from 'next/link';
-import { useInView } from 'react-intersection-observer';
 
-export const CallToAction = () => {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
+const ease = [0.22, 1, 0.36, 1] as const;
 
-  const features = [
-    {
-      icon: (
-        <svg viewBox='0 0 24 24' className='h-6 w-6 fill-current'>
-          <path d='M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-2a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm1-9h3v2h-3v3h-2v-3H8v-2h3V8h2v3z' />
-        </svg>
-      ),
-      title: 'Serviço feito remotamente.',
-      description:
-        'A UPBOOST realiza otimizações de alto nível 100% online, feito remotamente via anydesk. garantindo segurança e eficiência no seu PC sem a necessidade de deslocamento.',
-    },
-    {
-      icon: (
-        <svg viewBox='0 0 24 24' className='h-6 w-6 fill-current'>
-          <path d='M13 9.874v10l-3.773-1.992c-3.301-1.74-4.461-5.55-2.608-8.577l3.774-6.142c1.853-3.027 5.933-4.084 9.234-2.343l.232.123c3.301 1.74 4.461 5.55 2.608 8.577l-3.774 6.142A6.754 6.754 0 0 1 13 9.874z' />
-        </svg>
-      ),
-      title: 'Otimização de máquina por completo',
-      description:
-        'Nosso serviço ajusta cada detalhe do seu sistema operacional, maximizando o desempenho e eliminando processos desnecessários para uma performance superior.',
-    },
-    {
-      icon: (
-        <svg viewBox='0 0 24 24' className='h-6 w-6 fill-current'>
-          <path d='M17 15.245v6.872a.5.5 0 0 1-.757.429L12 20l-4.243 2.546a.5.5 0 0 1-.757-.43v-6.87a8 8 0 1 1 10 0zm-8 1.173v3.05l3-1.8 3 1.8v-3.05A7.978 7.978 0 0 1 12 17a7.978 7.978 0 0 1-3-.582zM12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12z' />
-        </svg>
-      ),
-      title: 'Remoção de input-lag/input-delay',
-      description:
-        'Reduza significativamente o atraso nos comandos, garantindo respostas instantâneas e maior precisão em seus jogos competitivos.',
-    },
-    {
-      icon: (
-        <svg viewBox='0 0 24 24' className='h-6 w-6 fill-current'>
-          <path d='M4 6.414L.757 3.172l1.415-1.415L5.414 5h15.242a1 1 0 0 1 .958 1.287l-2.4 8a1 1 0 0 1-.958.713H6v2h11v2H5a1 1 0 0 1-1-1V6.414zM6 7v6h11.512l1.8-6H6zm-.5 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm12 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z' />
-        </svg>
-      ),
-      title: 'Aumento de FPS',
-      description:
-        'Aprimore sua experiência de jogo ajustando as configurações do sistema para obter mais FPS, estabilidade e fluidez nos games.',
-    },
-  ];
+// ── Bento card wrapper ─────────────────────────────────────────────────────────
 
-  return (
-    <section className='relative overflow-hidden bg-theme-900 py-20'>
-      {/* Animated background effects */}
-      <div className='absolute inset-0'>
-        <div className='absolute h-full w-full bg-[radial-gradient(circle_at_50%_50%,rgba(88,28,135,0.15),transparent_50%)]' />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0.3, 0.15, 0.3] }}
-          transition={{ duration: 5, repeat: Infinity }}
-          className='absolute -left-4 top-0 h-full w-3/4 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(168,85,247,0.15)_0deg,transparent_180deg)]'
-        />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0.2, 0.1, 0.2] }}
-          transition={{ duration: 5, repeat: Infinity, delay: 2.5 }}
-          className='absolute -right-4 top-0 h-full w-3/4 bg-[conic-gradient(from_0deg_at_50%_50%,rgba(168,85,247,0.15)_0deg,transparent_180deg)]'
-        />
-      </div>
+const BentoCard = ({
+  children,
+  className,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, ease, delay }}
+    className={cn(
+      'relative overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7',
+      className
+    )}
+  />
+);
 
-      {/* Header Content */}
+// ── Inner mock UI components ───────────────────────────────────────────────────
+
+const toggleItems = [
+  'Desativar processos em background',
+  'Limpar arquivos temporários',
+  'Otimizar registro do Windows',
+];
+
+const fpsItems = [
+  { icon: Cpu,   label: 'FREE RAM',       time: 'há 2h'  },
+  { icon: Zap,   label: 'JUNK REMOVIDO',  time: 'há 3h'  },
+  { icon: Globe, label: 'INPUT AJUSTADO', time: 'há 5h'  },
+];
+
+// ── Component ──────────────────────────────────────────────────────────────────
+
+export const CallToAction = () => (
+  <section className='bg-theme-900 py-20'>
+    <div className='container'>
+
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 20 }}
-        transition={{ duration: 0.7 }}
-        className='relative mx-auto mb-20 max-w-4xl px-4 text-center'
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease }}
+        className='mb-10 text-center'
       >
-        <motion.div
-          initial={{ scale: 0.95 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className='relative inline-block'
-        >
-          <motion.span
-            className='absolute -inset-1 rounded-lg bg-gradient-to-r from-theme-400/20 via-theme-400/10 to-transparent blur-xl'
-            animate={{ opacity: [0.5, 0.8, 0.5] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          />
-          <h2 className='relative mb-6 text-4xl font-bold leading-tight tracking-tight text-white md:text-5xl'>
-            Domine como os pro players! Maximize sua performance,
-            <br />
-            <span className='text-theme-400'>
-              e conquiste mais FPS com a UPBOOST.
-            </span>
-          </h2>
-        </motion.div>
-
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          className='mt-12'
-        >
-          <Link href='#planos'>
-            <Button
-              size='lg'
-              className='rounded-xl bg-theme-400 px-10 py-7 text-lg font-bold text-theme-900 shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all duration-300 hover:bg-theme-400/90 hover:shadow-[0_0_25px_rgba(168,85,247,0.4)]'
-            >
-              JUNTE-SE AGORA!
-            </Button>
-          </Link>
-        </motion.div>
+        <h2 className='font-sora text-3xl font-bold max-lg:text-2xl'>
+          Por que escolher a <span className='text-theme-400'>UPBOOST</span>?
+        </h2>
+        <p className='mt-2 text-sm text-neutral-400'>
+          Cada ajuste conta. Veja o que fazemos pelo seu PC.
+        </p>
       </motion.div>
 
-      {/* Features Grid */}
-      <div className='relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div
-          ref={ref}
-          className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'
+      {/* Bento grid */}
+      <div className='grid grid-cols-3 gap-4 max-lg:grid-cols-2 max-sm:grid-cols-1'>
+
+        {/* ── Card 1: Otimização — large ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease, delay: 0.05 }}
+          className='relative col-span-2 overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7 max-sm:col-span-1'
         >
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 20 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -5 }}
-              className='group relative'
-            >
-              <div className='to-theme-500/50 absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-theme-400/50 opacity-30 blur transition duration-500 group-hover:opacity-50' />
-              <div className='relative h-full rounded-2xl border border-theme-400/20 bg-theme-800 p-8 backdrop-blur-sm transition duration-300'>
-                <motion.div
-                  className='group-hover:text-theme-300 mb-4 text-theme-400 transition-colors duration-300'
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                >
-                  {feature.icon}
-                </motion.div>
-                <h3 className='group-hover:text-theme-300 mb-3 text-xl font-semibold text-theme-400 transition-colors duration-300'>
-                  {feature.title}
-                </h3>
-                <p className='text-sm text-zinc-400 transition-colors duration-300 group-hover:text-zinc-300'>
-                  {feature.description}
-                </p>
+          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>Sistema</p>
+          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>Otimização completa do sistema</h3>
+          <p className='mt-1 text-sm text-neutral-400'>
+            Processos, registros e serviços ajustados para a performance máxima do seu hardware.
+          </p>
+
+          <div className='mt-6 space-y-2.5'>
+            {toggleItems.map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, ease, delay: 0.2 + i * 0.09 }}
+                className='flex items-center justify-between rounded-2xl border border-white/6 bg-theme-900 px-4 py-3'
+              >
+                <div className='flex items-center gap-3'>
+                  <Zap className='h-3.5 w-3.5 shrink-0 text-theme-400' />
+                  <span className='text-xs font-medium uppercase tracking-wide text-neutral-300'>{item}</span>
+                </div>
+                {/* Toggle pill */}
+                <div className='relative h-5 w-9 shrink-0 rounded-full bg-theme-400'>
+                  <div className='absolute right-0.5 top-0.5 h-4 w-4 rounded-full bg-theme-900' />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ── Card 2: FPS ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease, delay: 0.1 }}
+          className='relative overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7'
+        >
+          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>Performance</p>
+          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>+FPS Garantido</h3>
+          <p className='mt-1 text-sm text-neutral-400'>
+            Do básico ao avançado, cada ajuste maximiza seus frames por segundo.
+          </p>
+
+          <div className='mt-6 space-y-0.5'>
+            {fpsItems.map(({ icon: Icon, label, time }, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.25 + i * 0.08 }}
+                className='flex items-center gap-3 border-b border-white/5 py-3 last:border-0'
+              >
+                <div className='flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-theme-400/10'>
+                  <Icon className='h-3.5 w-3.5 text-theme-400' />
+                </div>
+                <div className='min-w-0 flex-1'>
+                  <p className='text-[10px] text-neutral-500'>{time}</p>
+                  <p className='text-xs font-bold text-white'>{label}</p>
+                </div>
+                <div className='h-1.5 w-1.5 shrink-0 rounded-full bg-theme-400' />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ── Card 3: Serviço remoto ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease, delay: 0.15 }}
+          className='relative overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7'
+        >
+          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>Atendimento</p>
+          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>100% Remoto</h3>
+          <p className='mt-1 text-sm text-neutral-400'>
+            Via AnyDesk, sem sair de casa. Rápido, seguro e sem complicação.
+          </p>
+
+          <div className='mt-6 rounded-2xl border border-white/6 bg-theme-900 p-4'>
+            <div className='mb-4 flex items-center gap-2'>
+              <span className='h-1.5 w-1.5 animate-pulse rounded-full bg-green-400' />
+              <span className='text-xs text-neutral-400'>Conexão ativa</span>
+            </div>
+            <div className='flex items-center justify-between'>
+              <div className='flex flex-col items-center gap-1.5'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-theme-700'>
+                  <Monitor className='h-4 w-4 text-neutral-300' />
+                </div>
+                <span className='text-[10px] text-neutral-500'>Você</span>
               </div>
-            </motion.div>
-          ))}
-        </div>
+              <div className='mx-3 flex flex-1 items-center gap-1'>
+                <div className='h-px flex-1 bg-theme-400/25' />
+                <Wifi className='h-3.5 w-3.5 text-theme-400' />
+                <div className='h-px flex-1 bg-theme-400/25' />
+              </div>
+              <div className='flex flex-col items-center gap-1.5'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl border border-theme-400/25 bg-theme-400/10'>
+                  <Zap className='h-4 w-4 text-theme-400' />
+                </div>
+                <span className='text-[10px] font-bold text-theme-400'>UPBOOST</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Card 4: Input lag ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease, delay: 0.2 }}
+          className='relative overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7'
+        >
+          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>Latência</p>
+          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>Zero Input Lag</h3>
+          <p className='mt-1 text-sm text-neutral-400'>
+            Comandos mais rápidos e precisos para jogar no limite do seu potencial.
+          </p>
+
+          <div className='mt-6 space-y-5'>
+            <div>
+              <div className='mb-2 flex items-center justify-between'>
+                <span className='text-[10px] font-medium uppercase tracking-wide text-neutral-500'>Antes</span>
+                <span className='text-xs font-bold text-red-400'>45 ms</span>
+              </div>
+              <div className='h-2 w-full overflow-hidden rounded-full bg-white/5'>
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: '78%' }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.9, ease, delay: 0.35 }}
+                  className='h-full rounded-full bg-red-400/50'
+                />
+              </div>
+            </div>
+            <div>
+              <div className='mb-2 flex items-center justify-between'>
+                <span className='text-[10px] font-medium uppercase tracking-wide text-neutral-500'>Depois</span>
+                <span className='text-xs font-bold text-theme-400'>8 ms</span>
+              </div>
+              <div className='h-2 w-full overflow-hidden rounded-full bg-white/5'>
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: '14%' }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.9, ease, delay: 0.55 }}
+                  className='h-full rounded-full bg-theme-400'
+                />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Card 5: CTA ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease, delay: 0.25 }}
+          className='relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/8 bg-theme-700 p-7'
+        >
+          {/* Ambient glow */}
+          <div
+            aria-hidden
+            className='pointer-events-none absolute inset-0'
+            style={{ background: 'radial-gradient(ellipse 90% 55% at 50% 0%, rgba(255,211,0,0.07) 0%, transparent 70%)' }}
+          />
+
+          <div className='relative z-10'>
+            <div className='mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-theme-400/25 bg-theme-400/10'>
+              <ShoppingCart className='h-4 w-4 text-theme-400' />
+            </div>
+            <h3 className='font-sora text-2xl font-bold text-white'>
+              Pronto para turbinar seu PC?
+            </h3>
+            <p className='mt-2 text-sm text-neutral-400'>
+              Junte-se a mais de 4.000 clientes que já jogam no próximo nível.
+            </p>
+          </div>
+
+          <Link href='#planos' className='relative z-10 mt-8 block'>
+            <motion.button
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.15 }}
+              className='flex w-full items-center justify-center gap-2 rounded-xl bg-theme-400 py-3 text-sm font-semibold text-theme-900 transition-colors hover:bg-theme-400/90'
+            >
+              <ShoppingCart className='h-4 w-4' />
+              Ver planos
+            </motion.button>
+          </Link>
+        </motion.div>
+
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);

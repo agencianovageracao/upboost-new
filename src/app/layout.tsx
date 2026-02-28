@@ -6,6 +6,7 @@ import "./globals.css";
 import { ptBR } from "date-fns/locale";
 
 import { TawkTo } from "@/components/globals/site/TawkTo";
+import { SmoothScroll } from "@/components/globals/site/SmoothScroll";
 
 import { CookiesProvider } from "next-client-cookies/server";
 import { Toaster } from "@/components/ui/toaster";
@@ -87,7 +88,9 @@ export default function RootLayout({
 					/>
 				</head>
 				<body className={`${montserrat.className} ${sora.variable}`}>
+					<SmoothScroll>
 					{children}
+					</SmoothScroll>
 					<Toaster />
 					<noscript>
 						<img

@@ -1,7 +1,7 @@
 'use client';
 
 import { Footer } from '@/components/globals/site/Footer';
-import { NavbarMobile } from '@/components/globals/site/NavbarMobile';
+import { Navbar } from '@/components/globals/site/Navbar';
 import { ConsolePlans } from '@/components/page/home/ConsolePlans';
 import { Faq } from '@/components/page/home/Faq';
 import { LoadingScreen } from '@/components/globals/site/LoadingScreen';
@@ -9,7 +9,6 @@ import { Header } from '@/components/page/home/Header';
 import { Plans } from '@/components/page/home/Plans';
 import { GamePerformance } from '@/components/page/home/GamePerformance';
 import { PrincipalTestimonial } from '@/components/page/home/PrincipalTestimonial';
-import { Testimonials } from '@/components/page/home/Testimonials';
 import { useEffect, useState } from 'react';
 
 import { PageView } from '../lib/fbpixel';
@@ -26,21 +25,20 @@ export default function Home() {
   return (
     <>
       <LoadingScreen onDone={() => setLoaded(true)} />
-      <NavbarMobile />
+      <Navbar />
       <div id='inicio'>
         <Header loaded={loaded} />
       </div>
       <GamePerformance />
       <main>
+        <CallToAction />
         <div id='planos'>
           <Plans />
-          <ConsolePlans />
         </div>
+        <PrincipalTestimonial />
         <div id='faq'>
           <Faq />
         </div>
-        <PrincipalTestimonial />
-        <CallToAction />
       </main>
       <Footer />
     </>
