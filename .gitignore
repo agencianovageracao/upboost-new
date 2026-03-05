@@ -35,16 +35,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# next-video
-public/videos/*
-!public/videos/*.json
-!public/videos/*.js
-!public/videos/*.ts
 public/_next-video
-
-# next-video
+public/videos/**/*_original.mp4
 videos/*
 !videos/*.json
 !videos/*.js
 !videos/*.ts
-public/_next-video
