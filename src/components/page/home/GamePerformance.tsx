@@ -66,15 +66,29 @@ export const GamePerformance = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
-  const videoOnRef = useRef<HTMLVideoElement>(null);
-  const videoOffRef = useRef<HTMLVideoElement>(null);
+  const videoOnRef = useRef<HTMLVideoElement | null>(null);
+  const videoOffRef = useRef<HTMLVideoElement | null>(null);
   const isVisible = useRef(false);
 
   const game = games.find((g) => g.id === selectedId)!;
 
-  const tryPlay = useCallback((el: HTMLVideoElement | null) => {
+  // Callback refs: setam muted via JS (bug do React no Safari iOS) e guardam a ref
+  const setupOff = useCallback((el: HTMLVideoElement | null) => {
+    videoOffRef.current = el;
     if (!el) return;
-    el.play().catch(() => {});
+    el.muted = true;
+    el.defaultMuted = true;
+    el.setAttribute('playsinline', '');
+    el.setAttribute('webkit-playsinline', '');
+  }, []);
+
+  const setupOn = useCallback((el: HTMLVideoElement | null) => {
+    videoOnRef.current = el;
+    if (!el) return;
+    el.muted = true;
+    el.defaultMuted = true;
+    el.setAttribute('playsinline', '');
+    el.setAttribute('webkit-playsinline', '');
   }, []);
 
   // Pausa quando fora da viewport (performance/bateria)
@@ -83,8 +97,8 @@ export const GamePerformance = () => {
       ([entry]) => {
         isVisible.current = entry.isIntersecting;
         if (entry.isIntersecting) {
-          tryPlay(videoOnRef.current);
-          tryPlay(videoOffRef.current);
+          videoOnRef.current?.play().catch(() => {});
+          videoOffRef.current?.play().catch(() => {});
         } else {
           videoOnRef.current?.pause();
           videoOffRef.current?.pause();
@@ -94,17 +108,19 @@ export const GamePerformance = () => {
     );
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
-  }, [tryPlay]);
+  }, []);
 
   // Recarrega ao trocar jogo (key remonta o elemento; load() garante Safari)
   useEffect(() => {
-    const load = (el: HTMLVideoElement | null) => {
+    const setup = (el: HTMLVideoElement | null) => {
       if (!el) return;
+      el.muted = true;
+      el.defaultMuted = true;
       el.load();
       if (isVisible.current) el.play().catch(() => {});
     };
-    load(videoOnRef.current);
-    load(videoOffRef.current);
+    setup(videoOnRef.current);
+    setup(videoOffRef.current);
   }, [selectedId]);
 
   const updateSlider = useCallback((clientX: number) => {
@@ -178,7 +194,7 @@ export const GamePerformance = () => {
               {/* Sem UPBOOST */}
               <video
                 key={`${game.id}-off`}
-                ref={videoOffRef}
+                ref={setupOff}
                 className='absolute inset-0 h-full w-full object-cover'
                 autoPlay
                 loop
@@ -189,20 +205,27 @@ export const GamePerformance = () => {
                 <source src={game.videoOff} type='video/mp4' />
               </video>
 
-              {/* Com UPBOOST */}
-              <video
-                key={`${game.id}-on`}
-                ref={videoOnRef}
-                className='absolute inset-0 h-full w-full object-cover'
-                style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload='auto'
+              {/* Com UPBOOST — clip-path no wrapper div, não no <video> (bug Safari iOS) */}
+              <div
+                className='absolute inset-0'
+                style={{
+                  clipPath: `inset(0 ${100 - sliderPos}% 0 0)`,
+                  WebkitClipPath: `inset(0 ${100 - sliderPos}% 0 0)`,
+                }}
               >
-                <source src={game.videoOn} type='video/mp4' />
-              </video>
+                <video
+                  key={`${game.id}-on`}
+                  ref={setupOn}
+                  className='absolute inset-0 h-full w-full object-cover'
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload='auto'
+                >
+                  <source src={game.videoOn} type='video/mp4' />
+                </video>
+              </div>
 
               {/* Divider */}
               <div
