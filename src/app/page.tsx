@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { PageView } from '../lib/fbpixel';
 import { Title } from '@/components/globals/site/Title';
 import { CallToAction } from '@/components/page/home/CallToAction';
+import { VideoComparison } from '@/components/page/home/VideoComparison';
 
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
@@ -30,6 +31,7 @@ export default function Home() {
         <Header loaded={loaded} />
       </div>
       <GamePerformance />
+      <VideoComparison />
       <main>
         <CallToAction />
         <div id='planos'>
