@@ -27,7 +27,7 @@ const legalLinks = [
   { label: 'Reembolso', href: '/politica-de-reembolso' },
 ];
 
-const statPills = ['+200 FPS de ganho', '+4.000 clientes', '+10 países'];
+const statPills = ['+200 FPS de ganho', '+12.000 clientes', '+10 países'];
 
 // ── Logo ───────────────────────────────────────────────────────────────────────
 
@@ -253,7 +253,7 @@ export const Footer = () => (
               Pronto para turbinar seu PC?
             </h3>
             <p className='relative z-10 mt-1 text-xs text-neutral-500'>
-              Mais de 4.000 clientes já jogam no próximo nível.
+              Mais de 12.000 clientes já jogam no próximo nível.
             </p>
             <Link href='#planos' className='relative z-10 mt-5 block'>
               <motion.button

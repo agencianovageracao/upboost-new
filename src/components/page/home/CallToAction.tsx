@@ -24,7 +24,7 @@ const BentoCard = ({
     viewport={{ once: true }}
     transition={{ duration: 0.5, ease, delay }}
     className={cn(
-      'relative overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7',
+      'border-white/8 relative overflow-hidden rounded-3xl border bg-theme-800 p-7',
       className
     )}
   />
@@ -39,9 +39,9 @@ const toggleItems = [
 ];
 
 const fpsItems = [
-  { icon: Cpu,   label: 'FREE RAM',       time: 'há 2h'  },
-  { icon: Zap,   label: 'JUNK REMOVIDO',  time: 'há 3h'  },
-  { icon: Globe, label: 'INPUT AJUSTADO', time: 'há 5h'  },
+  { icon: Cpu, label: 'FREE RAM', time: 'há 2h' },
+  { icon: Zap, label: 'JUNK REMOVIDO', time: 'há 3h' },
+  { icon: Globe, label: 'INPUT AJUSTADO', time: 'há 5h' },
 ];
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -49,7 +49,6 @@ const fpsItems = [
 export const CallToAction = () => (
   <section className='bg-theme-900 py-20'>
     <div className='container'>
-
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -68,19 +67,23 @@ export const CallToAction = () => (
 
       {/* Bento grid */}
       <div className='grid grid-cols-3 gap-4 max-lg:grid-cols-2 max-sm:grid-cols-1'>
-
         {/* ── Card 1: Otimização — large ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease, delay: 0.05 }}
-          className='relative col-span-2 overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7 max-sm:col-span-1'
+          className='border-white/8 relative col-span-2 overflow-hidden rounded-3xl border bg-theme-800 p-7 max-sm:col-span-1'
         >
-          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>Sistema</p>
-          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>Otimização completa do sistema</h3>
+          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>
+            Sistema
+          </p>
+          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>
+            Otimização completa do sistema
+          </h3>
           <p className='mt-1 text-sm text-neutral-400'>
-            Processos, registros e serviços ajustados para a performance máxima do seu hardware.
+            Processos, registros e serviços ajustados para a performance máxima
+            do seu hardware.
           </p>
 
           <div className='mt-6 space-y-2.5'>
@@ -91,11 +94,13 @@ export const CallToAction = () => (
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, ease, delay: 0.2 + i * 0.09 }}
-                className='flex items-center justify-between rounded-2xl border border-white/6 bg-theme-900 px-4 py-3'
+                className='border-white/6 flex items-center justify-between rounded-2xl border bg-theme-900 px-4 py-3'
               >
                 <div className='flex items-center gap-3'>
                   <Zap className='h-3.5 w-3.5 shrink-0 text-theme-400' />
-                  <span className='text-xs font-medium uppercase tracking-wide text-neutral-300'>{item}</span>
+                  <span className='text-xs font-medium uppercase tracking-wide text-neutral-300'>
+                    {item}
+                  </span>
                 </div>
                 {/* Toggle pill */}
                 <div className='relative h-5 w-9 shrink-0 rounded-full bg-theme-400'>
@@ -112,10 +117,14 @@ export const CallToAction = () => (
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease, delay: 0.1 }}
-          className='relative overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7'
+          className='border-white/8 relative overflow-hidden rounded-3xl border bg-theme-800 p-7'
         >
-          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>Performance</p>
-          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>+FPS Garantido</h3>
+          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>
+            Performance
+          </p>
+          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>
+            +FPS Garantido
+          </h3>
           <p className='mt-1 text-sm text-neutral-400'>
             Do básico ao avançado, cada ajuste maximiza seus frames por segundo.
           </p>
@@ -149,22 +158,26 @@ export const CallToAction = () => (
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease, delay: 0.15 }}
-          className='relative overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7'
+          className='border-white/8 relative overflow-hidden rounded-3xl border bg-theme-800 p-7'
         >
-          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>Atendimento</p>
-          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>100% Remoto</h3>
+          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>
+            Atendimento
+          </p>
+          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>
+            100% Remoto
+          </h3>
           <p className='mt-1 text-sm text-neutral-400'>
             Via AnyDesk, sem sair de casa. Rápido, seguro e sem complicação.
           </p>
 
-          <div className='mt-6 rounded-2xl border border-white/6 bg-theme-900 p-4'>
+          <div className='border-white/6 mt-6 rounded-2xl border bg-theme-900 p-4'>
             <div className='mb-4 flex items-center gap-2'>
               <span className='h-1.5 w-1.5 animate-pulse rounded-full bg-green-400' />
               <span className='text-xs text-neutral-400'>Conexão ativa</span>
             </div>
             <div className='flex items-center justify-between'>
               <div className='flex flex-col items-center gap-1.5'>
-                <div className='flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-theme-700'>
+                <div className='border-white/8 flex h-10 w-10 items-center justify-center rounded-xl border bg-theme-700'>
                   <Monitor className='h-4 w-4 text-neutral-300' />
                 </div>
                 <span className='text-[10px] text-neutral-500'>Você</span>
@@ -178,7 +191,9 @@ export const CallToAction = () => (
                 <div className='flex h-10 w-10 items-center justify-center rounded-xl border border-theme-400/25 bg-theme-400/10'>
                   <Zap className='h-4 w-4 text-theme-400' />
                 </div>
-                <span className='text-[10px] font-bold text-theme-400'>UPBOOST</span>
+                <span className='text-[10px] font-bold text-theme-400'>
+                  UPBOOST
+                </span>
               </div>
             </div>
           </div>
@@ -190,18 +205,25 @@ export const CallToAction = () => (
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease, delay: 0.2 }}
-          className='relative overflow-hidden rounded-3xl border border-white/8 bg-theme-800 p-7'
+          className='border-white/8 relative overflow-hidden rounded-3xl border bg-theme-800 p-7'
         >
-          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>Latência</p>
-          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>Zero Input Lag</h3>
+          <p className='text-xs font-semibold uppercase tracking-widest text-theme-400'>
+            Latência
+          </p>
+          <h3 className='mt-1 font-sora text-2xl font-bold text-white'>
+            Zero Input Lag
+          </h3>
           <p className='mt-1 text-sm text-neutral-400'>
-            Comandos mais rápidos e precisos para jogar no limite do seu potencial.
+            Comandos mais rápidos e precisos para jogar no limite do seu
+            potencial.
           </p>
 
           <div className='mt-6 space-y-5'>
             <div>
               <div className='mb-2 flex items-center justify-between'>
-                <span className='text-[10px] font-medium uppercase tracking-wide text-neutral-500'>Antes</span>
+                <span className='text-[10px] font-medium uppercase tracking-wide text-neutral-500'>
+                  Antes
+                </span>
                 <span className='text-xs font-bold text-red-400'>45 ms</span>
               </div>
               <div className='h-2 w-full overflow-hidden rounded-full bg-white/5'>
@@ -216,7 +238,9 @@ export const CallToAction = () => (
             </div>
             <div>
               <div className='mb-2 flex items-center justify-between'>
-                <span className='text-[10px] font-medium uppercase tracking-wide text-neutral-500'>Depois</span>
+                <span className='text-[10px] font-medium uppercase tracking-wide text-neutral-500'>
+                  Depois
+                </span>
                 <span className='text-xs font-bold text-theme-400'>8 ms</span>
               </div>
               <div className='h-2 w-full overflow-hidden rounded-full bg-white/5'>
@@ -238,13 +262,16 @@ export const CallToAction = () => (
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease, delay: 0.25 }}
-          className='relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/8 bg-theme-700 p-7'
+          className='border-white/8 relative flex flex-col justify-between overflow-hidden rounded-3xl border bg-theme-700 p-7'
         >
           {/* Ambient glow */}
           <div
             aria-hidden
             className='pointer-events-none absolute inset-0'
-            style={{ background: 'radial-gradient(ellipse 90% 55% at 50% 0%, rgba(255,211,0,0.07) 0%, transparent 70%)' }}
+            style={{
+              background:
+                'radial-gradient(ellipse 90% 55% at 50% 0%, rgba(255,211,0,0.07) 0%, transparent 70%)',
+            }}
           />
 
           <div className='relative z-10'>
@@ -255,7 +282,7 @@ export const CallToAction = () => (
               Pronto para turbinar seu PC?
             </h3>
             <p className='mt-2 text-sm text-neutral-400'>
-              Junte-se a mais de 4.000 clientes que já jogam no próximo nível.
+              Junte-se a mais de 12.000 clientes que já jogam no próximo nível.
             </p>
           </div>
 
@@ -271,7 +298,6 @@ export const CallToAction = () => (
             </motion.button>
           </Link>
         </motion.div>
-
       </div>
     </div>
   </section>

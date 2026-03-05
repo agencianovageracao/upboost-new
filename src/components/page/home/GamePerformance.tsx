@@ -1,31 +1,111 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Check, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const games = [
-  { id: 'cs2',      name: 'Counter-Strike 2',  ext: 'png', fpsOn: 280, fpsOff: 165, latOn: '1ms',  latOff: '22ms', boost: 70 },
-  { id: 'valorant', name: 'Valorant',           ext: 'svg', fpsOn: 320, fpsOff: 190, latOn: '1ms',  latOff: '18ms', boost: 68 },
-  { id: 'fortnite', name: 'Fortnite',           ext: 'png', fpsOn: 240, fpsOff: 150, latOn: '2ms',  latOff: '25ms', boost: 60 },
-  { id: 'warzone',  name: 'Warzone',            ext: 'png', fpsOn: 180, fpsOff: 110, latOn: '2ms',  latOff: '28ms', boost: 64 },
-  { id: 'pubg',     name: 'PUBG',               ext: 'png', fpsOn: 160, fpsOff:  95, latOn: '2ms',  latOff: '30ms', boost: 68 },
-  { id: 'r6s',      name: 'Rainbow Six Siege',  ext: 'png', fpsOn: 300, fpsOff: 185, latOn: '1ms',  latOff: '20ms', boost: 62 },
+  {
+    id: 'fortnite',
+    name: 'Fortnite',
+    logo: '/images/tinified/fortnite.png',
+    fpsOn: 240,
+    fpsOff: 150,
+    latOn: '2ms',
+    latOff: '25ms',
+    boost: 60,
+    videoOn: '/videos/games/fortnite/fortnite-depois.mp4',
+    videoOff: '/videos/games/fortnite/fortnite-antes.mp4',
+  },
+  {
+    id: 'fivem',
+    name: 'FiveM / GTA V',
+    logo: '/images/tinified/fivem.png',
+    fpsOn: 160,
+    fpsOff: 95,
+    latOn: '2ms',
+    latOff: '30ms',
+    boost: 68,
+    videoOn: '/videos/games/fivem/fivem-depois.mp4',
+    videoOff: '/videos/games/fivem/fivem-antes.mp4',
+  },
+  {
+    id: 'bf6',
+    name: 'Battlefield 6',
+    logo: null,
+    fpsOn: 130,
+    fpsOff: 78,
+    latOn: '3ms',
+    latOff: '32ms',
+    boost: 67,
+    videoOn: '/videos/games/bf6/bf6-depois.mp4',
+    videoOff: '/videos/games/bf6/bf6-antes.mp4',
+  },
+  {
+    id: 'valorant',
+    name: 'Valorant',
+    logo: '/images/tinified/valorant.png',
+    fpsOn: 320,
+    fpsOff: 190,
+    latOn: '1ms',
+    latOff: '18ms',
+    boost: 68,
+    videoOn: '/videos/games/valorant/valorant-depois.mp4',
+    videoOff: '/videos/games/valorant/valorant-antes.mp4',
+  },
 ];
 
 const MAX_FPS = 380;
 
 export const GamePerformance = () => {
-  const [selectedId, setSelectedId] = useState('cs2');
+  const [selectedId, setSelectedId] = useState('fivem');
   const [open, setOpen] = useState(false);
-
-  // Comparison slider state
   const [sliderPos, setSliderPos] = useState(50);
+
+  const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
+  const videoOnRef = useRef<HTMLVideoElement>(null);
+  const videoOffRef = useRef<HTMLVideoElement>(null);
+  const isVisible = useRef(false);
 
-  const game = games.find(g => g.id === selectedId)!;
+  const game = games.find((g) => g.id === selectedId)!;
+
+  const tryPlay = useCallback((el: HTMLVideoElement | null) => {
+    if (!el) return;
+    el.play().catch(() => {});
+  }, []);
+
+  // Pausa quando fora da viewport (performance/bateria)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible.current = entry.isIntersecting;
+        if (entry.isIntersecting) {
+          tryPlay(videoOnRef.current);
+          tryPlay(videoOffRef.current);
+        } else {
+          videoOnRef.current?.pause();
+          videoOffRef.current?.pause();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [tryPlay]);
+
+  // Recarrega ao trocar jogo (key remonta o elemento; load() garante Safari)
+  useEffect(() => {
+    const load = (el: HTMLVideoElement | null) => {
+      if (!el) return;
+      el.load();
+      if (isVisible.current) el.play().catch(() => {});
+    };
+    load(videoOnRef.current);
+    load(videoOffRef.current);
+  }, [selectedId]);
 
   const updateSlider = useCallback((clientX: number) => {
     if (!containerRef.current) return;
@@ -34,210 +114,311 @@ export const GamePerformance = () => {
     setSliderPos(Math.max(2, Math.min(98, x)));
   }, []);
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    isDragging.current = true;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    updateSlider(e.clientX);
-  }, [updateSlider]);
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      isDragging.current = true;
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      updateSlider(e.clientX);
+    },
+    [updateSlider]
+  );
 
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (isDragging.current) updateSlider(e.clientX);
-  }, [updateSlider]);
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (isDragging.current) updateSlider(e.clientX);
+    },
+    [updateSlider]
+  );
 
-  const handlePointerUp = useCallback(() => { isDragging.current = false; }, []);
+  const stopDrag = useCallback(() => {
+    isDragging.current = false;
+  }, []);
+
+  // Fecha o dropdown ao clicar fora
+  const selectRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
 
   return (
-    <section className='bg-theme-900 py-20'>
+    <section ref={sectionRef} className='my-20 bg-theme-900'>
       <div className='container'>
-
         {/* Header */}
-        <div className='mb-10 text-center'>
+        <div className='mb-8 text-center'>
           <h2 className='font-sora text-3xl font-bold max-lg:text-2xl'>
             Performance <span className='text-theme-400'>comprovada</span>
           </h2>
           <p className='mt-2 text-sm text-neutral-400'>
-            Arraste a linha para comparar — selecione o jogo para ver as métricas
+            Selecione o jogo e arraste a linha para comparar
           </p>
         </div>
 
-        {/* Main card */}
-        <div className='flex overflow-hidden rounded-2xl border border-white/5 bg-theme-800 max-lg:flex-col'>
+        {/* Grid 3:2 — vídeo | select + cards */}
+        <div className='grid grid-cols-5 gap-4 max-md:grid-cols-1'>
 
-          {/* Left — video comparison slider (16:9) */}
-          <div
-            ref={containerRef}
-            className='relative w-1/2 cursor-ew-resize select-none overflow-hidden max-lg:w-full'
-            style={{ aspectRatio: '16 / 9' }}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerLeave={handlePointerUp}
-          >
-            {/* Right video — Sem UPBOOST (background) */}
-            <video
-              className='absolute inset-0 h-full w-full object-cover'
-              autoPlay loop muted playsInline preload='metadata'
-            >
-              <source src='/videos/upboost_off.mp4' type='video/mp4' />
-            </video>
-
-            {/* Left video — Com UPBOOST (clipped) */}
-            <video
-              className='absolute inset-0 h-full w-full object-cover'
-              style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
-              autoPlay loop muted playsInline preload='metadata'
-            >
-              <source src='/videos/upboost_on.mp4' type='video/mp4' />
-            </video>
-
-            {/* Divider */}
+          {/* Coluna esquerda — Vídeo (3 partes) */}
+          <div className='col-span-3 max-md:col-span-1'>
             <div
-              className='pointer-events-none absolute bottom-0 top-0 z-10 flex w-0 items-center justify-center'
-              style={{ left: `${sliderPos}%` }}
+              ref={containerRef}
+              className='relative w-full cursor-ew-resize select-none overflow-hidden rounded-2xl'
+              style={{ aspectRatio: '16 / 9', touchAction: 'none' }}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={stopDrag}
+              onPointerLeave={stopDrag}
+              onPointerCancel={stopDrag}
             >
-              <div className='h-full w-px bg-white/70' />
-              <div className='pointer-events-auto absolute flex h-9 w-9 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-lg shadow-black/40'>
-                <ChevronLeft className='-mr-0.5 h-3.5 w-3.5 text-theme-900' />
-                <ChevronRight className='-ml-0.5 h-3.5 w-3.5 text-theme-900' />
+              {/* Sem UPBOOST */}
+              <video
+                key={`${game.id}-off`}
+                ref={videoOffRef}
+                className='absolute inset-0 h-full w-full object-cover'
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload='auto'
+              >
+                <source src={game.videoOff} type='video/mp4' />
+              </video>
+
+              {/* Com UPBOOST */}
+              <video
+                key={`${game.id}-on`}
+                ref={videoOnRef}
+                className='absolute inset-0 h-full w-full object-cover'
+                style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload='auto'
+              >
+                <source src={game.videoOn} type='video/mp4' />
+              </video>
+
+              {/* Divider */}
+              <div
+                className='pointer-events-none absolute bottom-0 top-0 z-10 flex w-0 items-center justify-center'
+                style={{ left: `${sliderPos}%` }}
+              >
+                <div className='h-full w-px bg-white/70' />
+                <div className='pointer-events-auto absolute flex h-9 w-9 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-lg shadow-black/40'>
+                  <ChevronLeft className='-mr-0.5 h-3.5 w-3.5 text-theme-900' />
+                  <ChevronRight className='-ml-0.5 h-3.5 w-3.5 text-theme-900' />
+                </div>
+              </div>
+
+              {/* Labels — sumem quando o slider passa por cima */}
+              <div
+                className='pointer-events-none absolute inset-y-0 left-0 z-10 overflow-hidden'
+                style={{ right: `${100 - sliderPos}%` }}
+              >
+                <div className='absolute left-3 top-3 rounded-md bg-theme-900/80 px-2.5 py-1 text-xs font-bold text-theme-400 backdrop-blur-sm'>
+                  Com a UPBOOST
+                </div>
+              </div>
+              <div
+                className='pointer-events-none absolute inset-y-0 right-0 z-10 overflow-hidden'
+                style={{ left: `${sliderPos}%` }}
+              >
+                <div className='absolute right-3 top-3 rounded-md bg-theme-900/80 px-2.5 py-1 text-xs text-neutral-400 backdrop-blur-sm'>
+                  Sem a UPBOOST
+                </div>
               </div>
             </div>
 
-            {/* Labels */}
-            <div className='absolute left-3 top-3 z-10 rounded-md bg-theme-900/80 px-2.5 py-1 text-xs font-bold text-theme-400 backdrop-blur-sm'>
-              Com a UPBOOST
-            </div>
-            <div className='absolute right-3 top-3 z-10 rounded-md bg-theme-900/80 px-2.5 py-1 text-xs text-neutral-400 backdrop-blur-sm'>
-              Sem a UPBOOST
-            </div>
+            {/* Footnote */}
+            <p className='mt-3 text-xs text-neutral-700 max-md:text-center'>
+              Testado com Intel i7-13700K (5.2ghz), RTX 4070 (stock), 32gb DDR5 —
+              Resultados podem variar.
+            </p>
           </div>
 
-          {/* Right — metrics */}
-          <div className='flex w-1/2 flex-col gap-7 p-8 max-lg:w-full max-sm:p-5'>
+          {/* Coluna direita — Select + Cards (2 partes) */}
+          <div className='col-span-2 flex flex-col gap-3 max-md:col-span-1'>
 
-            {/* Game selector */}
-            <div className='relative'>
+            {/* Game select */}
+            <div ref={selectRef} className='relative w-full'>
               <button
-                onClick={() => setOpen(v => !v)}
-                className='flex w-full items-center gap-3 rounded-xl border border-white/5 bg-theme-700 p-4 text-left transition-colors hover:bg-theme-600'
+                onClick={() => setOpen((v) => !v)}
+                className='border-white/8 hover:border-white/12 flex w-full items-center gap-3 rounded-2xl border bg-theme-800 px-4 py-3.5 text-left shadow-lg shadow-black/30 transition-colors'
               >
-                <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-theme-800'>
-                  <Image
-                    src={`/images/tinified/${game.id}.${game.ext}`}
-                    alt={game.name}
-                    width={26}
-                    height={26}
-                    className='object-contain'
-                  />
+                <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-theme-700'>
+                  {game.logo ? (
+                    <Image
+                      src={game.logo}
+                      alt={game.name}
+                      width={22}
+                      height={22}
+                      className='object-contain'
+                    />
+                  ) : (
+                    <span className='text-[10px] font-bold text-neutral-300'>
+                      BF6
+                    </span>
+                  )}
                 </div>
-                <div className='flex-1'>
-                  <p className='text-sm font-semibold text-white'>{game.name}</p>
-                  <p className='text-xs text-neutral-500'>Comparação de performance</p>
-                </div>
+                <span className='flex-1 text-sm font-semibold text-white'>
+                  {game.name}
+                </span>
                 <ChevronDown
-                  className={`h-4 w-4 shrink-0 text-neutral-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                  className={`h-4 w-4 shrink-0 text-neutral-500 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
                 />
               </button>
 
               <AnimatePresence>
                 {open && (
                   <motion.div
-                    initial={{ opacity: 0, y: -6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.15 }}
-                    className='absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-white/5 bg-theme-700 shadow-2xl shadow-black/60'
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    className='border-white/8 absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-2xl border bg-theme-800 shadow-2xl shadow-black/60'
                   >
-                    {games.map(g => (
-                      <button
-                        key={g.id}
-                        onClick={() => { setSelectedId(g.id); setOpen(false); }}
-                        className={`flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-theme-600 ${g.id === selectedId ? 'bg-theme-600 text-theme-400' : 'text-neutral-300'}`}
-                      >
-                        <div className='flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-theme-800'>
-                          <Image
-                            src={`/images/tinified/${g.id}.${g.ext}`}
-                            alt={g.name}
-                            width={20}
-                            height={20}
-                            className='object-contain'
-                          />
-                        </div>
-                        {g.name}
-                      </button>
-                    ))}
+                    {games.map((g, i) => {
+                      const active = g.id === selectedId;
+                      return (
+                        <button
+                          key={g.id}
+                          onClick={() => {
+                            setSelectedId(g.id);
+                            setOpen(false);
+                          }}
+                          className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors ${
+                            i > 0 ? 'border-t border-white/5' : ''
+                          } ${active ? 'bg-theme-700' : 'hover:bg-theme-700/50'}`}
+                        >
+                          <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-theme-700'>
+                            {g.logo ? (
+                              <Image
+                                src={g.logo}
+                                alt={g.name}
+                                width={22}
+                                height={22}
+                                className='object-contain'
+                              />
+                            ) : (
+                              <span className='text-[10px] font-bold text-neutral-300'>
+                                BF6
+                              </span>
+                            )}
+                          </div>
+                          <span
+                            className={`flex-1 text-sm font-medium ${active ? 'text-white' : 'text-neutral-400'}`}
+                          >
+                            {g.name}
+                          </span>
+                          {active && (
+                            <Check className='h-3.5 w-3.5 shrink-0 text-theme-400' />
+                          )}
+                        </button>
+                      );
+                    })}
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            {/* Boost % */}
-            <div>
+            {/* Cards informativos — empilhados verticalmente */}
+            {/* Boost */}
+            <div className='flex flex-1 flex-col justify-center rounded-xl border border-white/5 bg-theme-800 px-5 py-4'>
+              <p className='mb-1 text-[11px] uppercase tracking-wider text-neutral-500'>
+                Performance
+              </p>
               <AnimatePresence mode='wait'>
                 <motion.p
                   key={game.id + '-boost'}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
+                  exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.2 }}
-                  className='font-sora text-5xl font-bold text-theme-400 max-sm:text-4xl'
+                  className='font-sora text-3xl font-bold text-theme-400'
                 >
                   +{game.boost}%
                 </motion.p>
               </AnimatePresence>
-              <p className='mt-1 text-sm font-semibold text-neutral-300'>Aumento de performance</p>
+              <p className='mt-0.5 text-xs text-neutral-500'>
+                aumento médio de FPS
+              </p>
             </div>
 
             {/* FPS bars */}
-            <div className='flex flex-col gap-5'>
-              <div>
-                <div className='mb-2 flex items-center justify-between'>
-                  <span className='text-xs font-semibold uppercase tracking-wider text-white'>Com a UPBOOST</span>
-                  <span className='text-sm font-bold text-theme-400'>{game.fpsOn} FPS</span>
+            <div className='flex flex-1 flex-col justify-center rounded-xl border border-white/5 bg-theme-800 px-5 py-4'>
+              <p className='mb-3 text-[11px] uppercase tracking-wider text-neutral-500'>
+                Frames por segundo
+              </p>
+              <div className='flex flex-col gap-3'>
+                <div>
+                  <div className='mb-1.5 flex items-center justify-between'>
+                    <span className='text-xs font-semibold text-white'>
+                      Com UPBOOST
+                    </span>
+                    <span className='text-xs font-bold text-theme-400'>
+                      {game.fpsOn} FPS
+                    </span>
+                  </div>
+                  <div className='h-1.5 w-full overflow-hidden rounded-full bg-theme-700'>
+                    <motion.div
+                      key={`on-${game.id}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(game.fpsOn / MAX_FPS) * 100}%` }}
+                      transition={{ duration: 0.55, ease: 'easeOut' }}
+                      className='h-full rounded-full bg-theme-400'
+                    />
+                  </div>
                 </div>
-                <div className='h-2 w-full overflow-hidden rounded-full bg-theme-700'>
-                  <motion.div
-                    key={`on-${game.id}`}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(game.fpsOn / MAX_FPS) * 100}%` }}
-                    transition={{ duration: 0.55, ease: 'easeOut' }}
-                    className='h-full rounded-full bg-theme-400'
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className='mb-2 flex items-center justify-between'>
-                  <span className='text-xs font-medium uppercase tracking-wider text-neutral-500'>Sem a UPBOOST</span>
-                  <span className='text-sm text-neutral-500'>{game.fpsOff} FPS</span>
-                </div>
-                <div className='h-2 w-full overflow-hidden rounded-full bg-theme-700'>
-                  <motion.div
-                    key={`off-${game.id}`}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(game.fpsOff / MAX_FPS) * 100}%` }}
-                    transition={{ duration: 0.55, ease: 'easeOut' }}
-                    className='h-full rounded-full bg-theme-600'
-                  />
+                <div>
+                  <div className='mb-1.5 flex items-center justify-between'>
+                    <span className='text-xs text-neutral-500'>
+                      Sem UPBOOST
+                    </span>
+                    <span className='text-xs text-neutral-500'>
+                      {game.fpsOff} FPS
+                    </span>
+                  </div>
+                  <div className='h-1.5 w-full overflow-hidden rounded-full bg-theme-700'>
+                    <motion.div
+                      key={`off-${game.id}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(game.fpsOff / MAX_FPS) * 100}%` }}
+                      transition={{ duration: 0.55, ease: 'easeOut' }}
+                      className='h-full rounded-full bg-theme-600'
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Latency */}
-            <div className='grid grid-cols-2 gap-3'>
-              <div className='rounded-xl border border-theme-400/15 bg-theme-700 p-4'>
-                <p className='text-xs text-neutral-400'>Latência com UPBOOST</p>
-                <p className='mt-1 text-xl font-bold text-theme-400'>{game.latOn}</p>
-              </div>
-              <div className='rounded-xl border border-white/5 bg-theme-700 p-4'>
-                <p className='text-xs text-neutral-400'>Latência sem UPBOOST</p>
-                <p className='mt-1 text-xl font-bold text-neutral-500'>{game.latOff}</p>
+            <div className='flex flex-1 flex-col justify-center rounded-xl border border-white/5 bg-theme-800 px-5 py-4'>
+              <p className='mb-3 text-[11px] uppercase tracking-wider text-neutral-500'>
+                Latência
+              </p>
+              <div className='flex items-end justify-between'>
+                <div>
+                  <p className='text-[11px] text-neutral-500'>Com UPBOOST</p>
+                  <p className='font-sora text-2xl font-bold text-theme-400'>
+                    {game.latOn}
+                  </p>
+                </div>
+                <div className='mb-1 text-xs text-neutral-700'>vs</div>
+                <div className='text-right'>
+                  <p className='text-[11px] text-neutral-500'>Sem UPBOOST</p>
+                  <p className='font-sora text-2xl font-bold text-neutral-600'>
+                    {game.latOff}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Footnote */}
-            <p className='text-xs leading-relaxed text-neutral-600'>
-              Testado com Intel i7-13700K (5.2ghz), RTX 4070 (stock), 32gb DDR5 — Resultados podem variar.
-            </p>
           </div>
         </div>
       </div>
