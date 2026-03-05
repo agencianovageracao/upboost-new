@@ -1,12 +1,23 @@
 'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const VideoComparison = () => {
   const [sliderPosition, setSliderPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
+  const videoOffRef = useRef<HTMLVideoElement>(null);
+  const videoOnRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Safari iOS ignora o atributo muted do React — precisa setar via JS
+    [videoOffRef, videoOnRef].forEach((ref) => {
+      if (!ref.current) return;
+      ref.current.muted = true;
+      ref.current.play().catch(() => {});
+    });
+  }, []);
 
   const updateSlider = useCallback((clientX: number) => {
     if (!containerRef.current) return;
@@ -55,25 +66,30 @@ export const VideoComparison = () => {
       >
         {/* Right side — Sem a UPBOOST (background layer) */}
         <video
+          ref={videoOffRef}
           className='absolute inset-0 h-full w-full object-cover'
           autoPlay
           loop
           muted
           playsInline
-          preload='metadata'
+          preload='auto'
         >
           <source src='/videos/upboost_off.mp4' type='video/mp4' />
         </video>
 
         {/* Left side — Com a UPBOOST (clipped with clip-path) */}
         <video
+          ref={videoOnRef}
           className='absolute inset-0 h-full w-full object-cover'
-          style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
+          style={{
+            clipPath: `inset(0 ${100 - sliderPosition}% 0 0)`,
+            WebkitClipPath: `inset(0 ${100 - sliderPosition}% 0 0)`,
+          }}
           autoPlay
           loop
           muted
           playsInline
-          preload='metadata'
+          preload='auto'
         >
           <source src='/videos/upboost_on.mp4' type='video/mp4' />
         </video>

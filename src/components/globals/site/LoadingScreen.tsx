@@ -24,12 +24,12 @@ export const LoadingScreen = ({ onDone }: { onDone: () => void }) => {
 
   useEffect(() => {
     const hintTimer = setInterval(
-      () => setHintIndex(i => (i + 1) % hints.length),
-      750,
+      () => setHintIndex((i) => (i + 1) % hints.length),
+      750
     );
     const doneTimer = setTimeout(() => {
       clearInterval(hintTimer);
-      onDone();   // notify parent — hero starts entering while screen fades
+      onDone(); // notify parent — hero starts entering while screen fades
       setDone(true);
     }, 3000);
 
@@ -114,8 +114,8 @@ export const LoadingScreen = ({ onDone }: { onDone: () => void }) => {
 
             {/* Name */}
             <div className='text-center'>
-              <h1 className='font-sora text-4xl font-bold uppercase tracking-[0.45em] text-white'>
-                Up<span className='text-theme-400'>Boost</span>
+              <h1 className='font-sora text-4xl font-bold uppercase text-theme-400'>
+                Up<span className='font-thin'>Boost</span>
               </h1>
               <p className='mt-2 text-[10px] uppercase tracking-[0.35em] text-neutral-600'>
                 Performance real. Resultados comprovados.
