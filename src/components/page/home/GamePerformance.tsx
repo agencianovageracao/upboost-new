@@ -78,13 +78,12 @@ export const GamePerformance = () => {
     if (!el) return;
     el.muted = true;
     el.defaultMuted = true;
+    el.setAttribute('muted', '');
     el.setAttribute('playsinline', '');
     el.setAttribute('webkit-playsinline', '');
-    el.load();
-    const tryPlay = () => el.play().catch(() => {});
-    el.addEventListener('loadeddata', tryPlay, { once: true });
-    el.addEventListener('canplay', tryPlay, { once: true });
-    tryPlay();
+    el.play().catch(() => {
+      el.addEventListener('canplay', () => el.play().catch(() => {}), { once: true });
+    });
   }, []);
 
   const setupOn = useCallback((el: HTMLVideoElement | null) => {
@@ -92,13 +91,12 @@ export const GamePerformance = () => {
     if (!el) return;
     el.muted = true;
     el.defaultMuted = true;
+    el.setAttribute('muted', '');
     el.setAttribute('playsinline', '');
     el.setAttribute('webkit-playsinline', '');
-    el.load();
-    const tryPlay = () => el.play().catch(() => {});
-    el.addEventListener('loadeddata', tryPlay, { once: true });
-    el.addEventListener('canplay', tryPlay, { once: true });
-    tryPlay();
+    el.play().catch(() => {
+      el.addEventListener('canplay', () => el.play().catch(() => {}), { once: true });
+    });
   }, []);
 
   // Pausa quando fora da viewport (performance/bateria)

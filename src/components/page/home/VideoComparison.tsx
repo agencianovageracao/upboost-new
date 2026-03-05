@@ -10,13 +10,12 @@ function setupVideo(el: HTMLVideoElement | null) {
   if (!el) return;
   el.muted = true;
   el.defaultMuted = true;
+  el.setAttribute('muted', '');
   el.setAttribute('playsinline', '');
   el.setAttribute('webkit-playsinline', '');
-  el.load();
-  const tryPlay = () => el.play().catch(() => {});
-  el.addEventListener('loadeddata', tryPlay, { once: true });
-  el.addEventListener('canplay', tryPlay, { once: true });
-  tryPlay();
+  el.play().catch(() => {
+    el.addEventListener('canplay', () => el.play().catch(() => {}), { once: true });
+  });
 }
 
 export const VideoComparison = () => {
