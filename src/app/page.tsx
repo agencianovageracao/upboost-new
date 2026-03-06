@@ -20,12 +20,18 @@ import { CallToAction } from '@/components/page/home/CallToAction';
 // vê <video autoplay> sem muted e bloqueia. Com ssr: false, os elementos <video>
 // só existem no DOM após o JS rodar, quando muted já está setado corretamente.
 const GamePerformance = dynamic(
-  () => import('@/components/page/home/GamePerformance').then((m) => ({ default: m.GamePerformance })),
-  { ssr: false },
+  () =>
+    import('@/components/page/home/GamePerformance').then((m) => ({
+      default: m.GamePerformance,
+    })),
+  { ssr: false }
 );
 const VideoComparison = dynamic(
-  () => import('@/components/page/home/VideoComparison').then((m) => ({ default: m.VideoComparison })),
-  { ssr: false },
+  () =>
+    import('@/components/page/home/VideoComparison').then((m) => ({
+      default: m.VideoComparison,
+    })),
+  { ssr: false }
 );
 
 export default function Home() {
@@ -43,7 +49,6 @@ export default function Home() {
         <Header loaded={loaded} />
       </div>
       <GamePerformance />
-      <VideoComparison />
       <main>
         <CallToAction />
         <div id='planos'>

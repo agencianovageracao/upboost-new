@@ -13,9 +13,10 @@ function setupVideo(el: HTMLVideoElement | null) {
   el.setAttribute('muted', '');
   el.setAttribute('playsinline', '');
   el.setAttribute('webkit-playsinline', '');
-  el.play().catch(() => {
-    el.addEventListener('canplay', () => el.play().catch(() => {}), { once: true });
-  });
+  // iOS ignora preload='auto' — load() força o browser a começar a baixar os dados.
+  // Só chama play() depois que há dados suficientes (canplay), não antes.
+  el.load();
+  el.addEventListener('canplay', () => el.play().catch(() => {}), { once: true });
 }
 
 export const VideoComparison = () => {
@@ -62,11 +63,12 @@ export const VideoComparison = () => {
       <div
         ref={containerRef}
         className='relative w-full cursor-ew-resize select-none overflow-hidden rounded-xl'
-        style={{ aspectRatio: '16 / 9' }}
+        style={{ aspectRatio: '16 / 9', touchAction: 'none' }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
+        onPointerCancel={handlePointerUp}
       >
         {/* Right side — Sem a UPBOOST (background layer) */}
         <video
@@ -110,7 +112,7 @@ export const VideoComparison = () => {
           style={{ left: `${sliderPosition}%` }}
         >
           <div className='h-full w-0.5 bg-white/80' />
-          <div className='pointer-events-auto absolute flex h-10 w-10 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-lg shadow-black/40'>
+          <div className='pointer-events-auto absolute flex h-12 w-12 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-lg shadow-black/40'>
             <ChevronLeft className='-mr-0.5 h-4 w-4 text-theme-800' />
             <ChevronRight className='-ml-0.5 h-4 w-4 text-theme-800' />
           </div>

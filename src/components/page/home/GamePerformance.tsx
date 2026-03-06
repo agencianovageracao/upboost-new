@@ -68,45 +68,48 @@ export const GamePerformance = () => {
   const isDragging = useRef(false);
   const videoOnRef = useRef<HTMLVideoElement | null>(null);
   const videoOffRef = useRef<HTMLVideoElement | null>(null);
-  const isVisible = useRef(false);
 
   const game = games.find((g) => g.id === selectedId)!;
 
-  // Callback refs: setam muted via JS (bug do React no Safari iOS) e guardam a ref
-  const setupOff = useCallback((el: HTMLVideoElement | null) => {
-    videoOffRef.current = el;
+  const play = useCallback((el: HTMLVideoElement | null) => {
     if (!el) return;
+    el.play().catch(() => {
+      // Safari iOS pode rejeitar play() antes do vídeo estar pronto
+      const onReady = () => el.play().catch(() => {});
+      el.addEventListener('canplay', onReady, { once: true });
+    });
+  }, []);
+
+  const setup = useCallback((el: HTMLVideoElement, ref: React.MutableRefObject<HTMLVideoElement | null>) => {
+    ref.current = el;
     el.muted = true;
     el.defaultMuted = true;
     el.setAttribute('muted', '');
     el.setAttribute('playsinline', '');
     el.setAttribute('webkit-playsinline', '');
+    // Não chamar el.load() — isso cancela o autoPlay nativo no Safari iOS
     el.play().catch(() => {
       el.addEventListener('canplay', () => el.play().catch(() => {}), { once: true });
     });
   }, []);
+
+  const setupOff = useCallback((el: HTMLVideoElement | null) => {
+    if (!el) { videoOffRef.current = null; return; }
+    setup(el, videoOffRef);
+  }, [setup]);
 
   const setupOn = useCallback((el: HTMLVideoElement | null) => {
-    videoOnRef.current = el;
-    if (!el) return;
-    el.muted = true;
-    el.defaultMuted = true;
-    el.setAttribute('muted', '');
-    el.setAttribute('playsinline', '');
-    el.setAttribute('webkit-playsinline', '');
-    el.play().catch(() => {
-      el.addEventListener('canplay', () => el.play().catch(() => {}), { once: true });
-    });
-  }, []);
+    if (!el) { videoOnRef.current = null; return; }
+    setup(el, videoOnRef);
+  }, [setup]);
 
-  // Pausa quando fora da viewport (performance/bateria)
+  // Pausa quando sai da viewport, retoma quando volta
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        isVisible.current = entry.isIntersecting;
         if (entry.isIntersecting) {
-          videoOnRef.current?.play().catch(() => {});
-          videoOffRef.current?.play().catch(() => {});
+          play(videoOnRef.current);
+          play(videoOffRef.current);
         } else {
           videoOnRef.current?.pause();
           videoOffRef.current?.pause();
@@ -116,20 +119,17 @@ export const GamePerformance = () => {
     );
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
-  }, []);
+  }, [play]);
 
-  // Recarrega ao trocar jogo (key remonta o elemento; load() garante Safari)
+  // Fallback: Safari iOS pode bloquear autoplay até a primeira interação
   useEffect(() => {
-    const setup = (el: HTMLVideoElement | null) => {
-      if (!el) return;
-      el.muted = true;
-      el.defaultMuted = true;
-      el.load();
-      if (isVisible.current) el.play().catch(() => {});
+    const playAll = () => {
+      play(videoOnRef.current);
+      play(videoOffRef.current);
     };
-    setup(videoOnRef.current);
-    setup(videoOffRef.current);
-  }, [selectedId]);
+    document.addEventListener('touchstart', playAll, { once: true });
+    return () => document.removeEventListener('touchstart', playAll);
+  }, [play]);
 
   const updateSlider = useCallback((clientX: number) => {
     if (!containerRef.current) return;
@@ -241,7 +241,7 @@ export const GamePerformance = () => {
                 style={{ left: `${sliderPos}%` }}
               >
                 <div className='h-full w-px bg-white/70' />
-                <div className='pointer-events-auto absolute flex h-9 w-9 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-lg shadow-black/40'>
+                <div className='pointer-events-auto absolute flex h-12 w-12 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-lg shadow-black/40'>
                   <ChevronLeft className='-mr-0.5 h-3.5 w-3.5 text-theme-900' />
                   <ChevronRight className='-ml-0.5 h-3.5 w-3.5 text-theme-900' />
                 </div>
