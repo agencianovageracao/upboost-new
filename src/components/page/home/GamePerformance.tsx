@@ -46,6 +46,7 @@ const games = [
     id: 'valorant',
     name: 'Valorant',
     logo: '/images/tinified/valorant.png',
+    invertLogo: true,
     fpsOn: 320,
     fpsOff: 190,
     latOn: '1ms',
@@ -66,8 +67,16 @@ export const GamePerformance = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
+  const [dragging, setDragging] = useState(false);
   const videoOnRef = useRef<HTMLVideoElement | null>(null);
   const videoOffRef = useRef<HTMLVideoElement | null>(null);
+
+  // Refs para manipulação direta do DOM durante drag (sem re-renders)
+  const clipRef = useRef<HTMLDivElement>(null);
+  const dividerRef = useRef<HTMLDivElement>(null);
+  const labelLeftRef = useRef<HTMLDivElement>(null);
+  const labelRightRef = useRef<HTMLDivElement>(null);
+  const posRef = useRef(50);
 
   const game = games.find((g) => g.id === selectedId)!;
 
@@ -80,28 +89,48 @@ export const GamePerformance = () => {
     });
   }, []);
 
-  const setup = useCallback((el: HTMLVideoElement, ref: React.MutableRefObject<HTMLVideoElement | null>) => {
-    ref.current = el;
-    el.muted = true;
-    el.defaultMuted = true;
-    el.setAttribute('muted', '');
-    el.setAttribute('playsinline', '');
-    el.setAttribute('webkit-playsinline', '');
-    // Não chamar el.load() — isso cancela o autoPlay nativo no Safari iOS
-    el.play().catch(() => {
-      el.addEventListener('canplay', () => el.play().catch(() => {}), { once: true });
-    });
-  }, []);
+  const setup = useCallback(
+    (
+      el: HTMLVideoElement,
+      ref: React.MutableRefObject<HTMLVideoElement | null>
+    ) => {
+      ref.current = el;
+      el.muted = true;
+      el.defaultMuted = true;
+      el.setAttribute('muted', '');
+      el.setAttribute('playsinline', '');
+      el.setAttribute('webkit-playsinline', '');
+      // Não chamar el.load() — isso cancela o autoPlay nativo no Safari iOS
+      el.play().catch(() => {
+        el.addEventListener('canplay', () => el.play().catch(() => {}), {
+          once: true,
+        });
+      });
+    },
+    []
+  );
 
-  const setupOff = useCallback((el: HTMLVideoElement | null) => {
-    if (!el) { videoOffRef.current = null; return; }
-    setup(el, videoOffRef);
-  }, [setup]);
+  const setupOff = useCallback(
+    (el: HTMLVideoElement | null) => {
+      if (!el) {
+        videoOffRef.current = null;
+        return;
+      }
+      setup(el, videoOffRef);
+    },
+    [setup]
+  );
 
-  const setupOn = useCallback((el: HTMLVideoElement | null) => {
-    if (!el) { videoOnRef.current = null; return; }
-    setup(el, videoOnRef);
-  }, [setup]);
+  const setupOn = useCallback(
+    (el: HTMLVideoElement | null) => {
+      if (!el) {
+        videoOnRef.current = null;
+        return;
+      }
+      setup(el, videoOnRef);
+    },
+    [setup]
+  );
 
   // Pausa quando sai da viewport, retoma quando volta
   useEffect(() => {
@@ -131,31 +160,101 @@ export const GamePerformance = () => {
     return () => document.removeEventListener('touchstart', playAll);
   }, [play]);
 
-  const updateSlider = useCallback((clientX: number) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = ((clientX - rect.left) / rect.width) * 100;
-    setSliderPos(Math.max(2, Math.min(98, x)));
+  // Atualiza DOM diretamente sem re-render — essencial pra fluidez no mobile
+  const applyPos = useCallback((pos: number) => {
+    posRef.current = pos;
+    const clip = `inset(0 ${100 - pos}% 0 0)`;
+    if (clipRef.current) {
+      clipRef.current.style.clipPath = clip;
+      clipRef.current.style.webkitClipPath = clip;
+    }
+    if (dividerRef.current) dividerRef.current.style.left = `${pos}%`;
+    if (labelLeftRef.current)
+      labelLeftRef.current.style.right = `${100 - pos}%`;
+    if (labelRightRef.current) labelRightRef.current.style.left = `${pos}%`;
   }, []);
 
+  const calcPos = useCallback((clientX: number) => {
+    if (!containerRef.current) return posRef.current;
+    const rect = containerRef.current.getBoundingClientRect();
+    return Math.max(
+      2,
+      Math.min(98, ((clientX - rect.left) / rect.width) * 100)
+    );
+  }, []);
+
+  // Touch events nativos — mais confiáveis que pointer events no iOS
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let startX = 0;
+    let moved = false;
+
+    const onTouchStart = (e: TouchEvent) => {
+      isDragging.current = true;
+      moved = false;
+      startX = e.touches[0].clientX;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDragging.current) return;
+      const touch = e.touches[0];
+      if (!moved) {
+        if (Math.abs(touch.clientX - startX) < 4) return;
+        moved = true;
+        setDragging(true);
+      }
+      e.preventDefault(); // Bloqueia scroll durante o arrasto
+      applyPos(calcPos(touch.clientX));
+    };
+
+    const onTouchEnd = () => {
+      if (moved) setSliderPos(posRef.current);
+      isDragging.current = false;
+      moved = false;
+      setDragging(false);
+    };
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd);
+    container.addEventListener('touchcancel', onTouchEnd);
+
+    return () => {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, [applyPos, calcPos]);
+
+  // Mouse events para desktop (pointer events)
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
+      if (e.pointerType === 'touch') return; // Touch é tratado acima
       isDragging.current = true;
+      setDragging(true);
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-      updateSlider(e.clientX);
+      const pos = calcPos(e.clientX);
+      applyPos(pos);
     },
-    [updateSlider]
+    [applyPos, calcPos]
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (isDragging.current) updateSlider(e.clientX);
+      if (e.pointerType === 'touch' || !isDragging.current) return;
+      applyPos(calcPos(e.clientX));
     },
-    [updateSlider]
+    [applyPos, calcPos]
   );
 
-  const stopDrag = useCallback(() => {
+  const stopDrag = useCallback((e: React.PointerEvent) => {
+    if (e.pointerType === 'touch') return;
+    if (isDragging.current) setSliderPos(posRef.current);
     isDragging.current = false;
+    setDragging(false);
   }, []);
 
   // Fecha o dropdown ao clicar fora
@@ -186,13 +285,12 @@ export const GamePerformance = () => {
 
         {/* Grid 3:2 — vídeo | select + cards */}
         <div className='grid grid-cols-5 gap-4 max-md:grid-cols-1'>
-
           {/* Coluna esquerda — Vídeo (3 partes) */}
           <div className='col-span-3 max-md:col-span-1'>
             <div
               ref={containerRef}
               className='relative w-full cursor-ew-resize select-none overflow-hidden rounded-2xl'
-              style={{ aspectRatio: '16 / 9', touchAction: 'none' }}
+              style={{ aspectRatio: '16 / 9', touchAction: 'pan-y' }}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={stopDrag}
@@ -215,6 +313,7 @@ export const GamePerformance = () => {
 
               {/* Com UPBOOST — clip-path no wrapper div, não no <video> (bug Safari iOS) */}
               <div
+                ref={clipRef}
                 className='absolute inset-0'
                 style={{
                   clipPath: `inset(0 ${100 - sliderPos}% 0 0)`,
@@ -237,45 +336,61 @@ export const GamePerformance = () => {
 
               {/* Divider */}
               <div
+                ref={dividerRef}
                 className='pointer-events-none absolute bottom-0 top-0 z-10 flex w-0 items-center justify-center'
                 style={{ left: `${sliderPos}%` }}
               >
-                <div className='h-full w-px bg-white/70' />
-                <div className='pointer-events-auto absolute flex h-12 w-12 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-lg shadow-black/40'>
-                  <ChevronLeft className='-mr-0.5 h-3.5 w-3.5 text-theme-900' />
-                  <ChevronRight className='-ml-0.5 h-3.5 w-3.5 text-theme-900' />
+                <div className='h-full w-0.5 bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.3)]' />
+                <div
+                  className={`pointer-events-auto absolute flex h-10 w-10 cursor-ew-resize items-center justify-center rounded-full border-2 border-white bg-theme-900/80 shadow-[0_0_16px_rgba(255,211,0,0.3)] backdrop-blur-sm transition-transform duration-150 md:h-12 md:w-12 ${
+                    dragging
+                      ? 'scale-110 shadow-[0_0_24px_rgba(255,211,0,0.5)]'
+                      : ''
+                  }`}
+                >
+                  <ChevronLeft className='-mr-0.5 h-3.5 w-3.5 text-white md:h-4 md:w-4' />
+                  <ChevronRight className='-ml-0.5 h-3.5 w-3.5 text-white md:h-4 md:w-4' />
                 </div>
+                {/* Área de toque expandida no mobile */}
+                <div className='pointer-events-auto absolute h-full w-12 cursor-ew-resize md:hidden' />
               </div>
 
               {/* Labels — sumem quando o slider passa por cima */}
               <div
+                ref={labelLeftRef}
                 className='pointer-events-none absolute inset-y-0 left-0 z-10 overflow-hidden'
                 style={{ right: `${100 - sliderPos}%` }}
               >
-                <div className='absolute left-3 top-3 rounded-md bg-theme-900/80 px-2.5 py-1 text-xs font-bold text-theme-400 backdrop-blur-sm'>
-                  Com a UPBOOST
+                <div className='absolute left-2 top-2 flex items-center gap-1.5 rounded-lg border border-theme-400/20 bg-theme-900/80 px-2 py-1 backdrop-blur-sm md:left-3 md:top-3 md:px-2.5'>
+                  <div className='h-1.5 w-1.5 rounded-full bg-theme-400' />
+                  <span className='whitespace-nowrap text-[10px] font-bold text-theme-400 md:text-xs'>
+                    Com UPBOOST
+                  </span>
                 </div>
               </div>
               <div
+                ref={labelRightRef}
                 className='pointer-events-none absolute inset-y-0 right-0 z-10 overflow-hidden'
                 style={{ left: `${sliderPos}%` }}
               >
-                <div className='absolute right-3 top-3 rounded-md bg-theme-900/80 px-2.5 py-1 text-xs text-neutral-400 backdrop-blur-sm'>
-                  Sem a UPBOOST
+                <div className='absolute right-2 top-2 flex items-center gap-1.5 rounded-lg border border-white/10 bg-theme-900/80 px-2 py-1 backdrop-blur-sm md:right-3 md:top-3 md:px-2.5'>
+                  <div className='h-1.5 w-1.5 rounded-full bg-neutral-500' />
+                  <span className='whitespace-nowrap text-[10px] text-neutral-400 md:text-xs'>
+                    Sem UPBOOST
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Footnote */}
             <p className='mt-3 text-xs text-neutral-700 max-md:text-center'>
-              Testado com Intel i7-13700K (5.2ghz), RTX 4070 (stock), 32gb DDR5 —
-              Resultados podem variar.
+              Testado com Intel i7-13700K (5.2ghz), RTX 4070 (stock), 32gb DDR5
+              — Resultados podem variar.
             </p>
           </div>
 
           {/* Coluna direita — Select + Cards (2 partes) */}
           <div className='col-span-2 flex flex-col gap-3 max-md:col-span-1'>
-
             {/* Game select */}
             <div ref={selectRef} className='relative w-full'>
               <button
@@ -289,7 +404,7 @@ export const GamePerformance = () => {
                       alt={game.name}
                       width={22}
                       height={22}
-                      className='object-contain'
+                      className={`object-contain ${'invertLogo' in game && game.invertLogo ? 'invert' : ''}`}
                     />
                   ) : (
                     <span className='text-[10px] font-bold text-neutral-300'>
@@ -334,7 +449,7 @@ export const GamePerformance = () => {
                                 alt={g.name}
                                 width={22}
                                 height={22}
-                                className='object-contain'
+                                className={`object-contain ${'invertLogo' in g && g.invertLogo ? 'invert' : ''}`}
                               />
                             ) : (
                               <span className='text-[10px] font-bold text-neutral-300'>
@@ -449,7 +564,6 @@ export const GamePerformance = () => {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>

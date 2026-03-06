@@ -37,6 +37,9 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-theme-900 text-white;
 
@@ -91,25 +94,31 @@
 }
 
 *::-webkit-scrollbar {
-  width: 0;
-  height: 5px;
-  overflow: hidden;
-  border-radius: 20px !important;
-  background-color: #1e263b;
-
-  @apply bg-theme-700;
+  width: 8px;
+  height: 6px;
 }
 
-&::-webkit-scrollbar-thumb {
-  border-radius: 20px !important;
-  background-color: #ffd300;
-
-  @apply bg-theme-400;
+*::-webkit-scrollbar-track {
+  background: #121724;
 }
 
-&::-webkit-scrollbar-button {
-  height: 0;
-  width: 0;
+*::-webkit-scrollbar-thumb {
+  background: #2b354f;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #FFD300;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2b354f #121724;
 }
 
 @keyframes slideDown {

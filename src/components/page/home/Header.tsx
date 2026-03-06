@@ -152,9 +152,9 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
             transition={{ duration: 0.6, ease, delay: 0.37 }}
             className='max-w-[460px] text-sm leading-relaxed text-neutral-400 max-lg:text-xs'
           >
-            Input lag, queda de FPS, stutter no clutch — isso custa rounds. A
-            UPBOOST otimiza seu Windows em até 20 minutos e você sente na
-            primeira partida.
+            Input lag, queda de FPS, stutter no clutch: isso custa rounds. A
+            UPBOOST otimiza seu Windows em até 20 minutos e você sente a
+            diferença na primeira partida.
           </motion.p>
 
           {/* CTA */}
@@ -172,37 +172,36 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
             </Link>
           </motion.div>
 
-          {/* Social proof — redesigned */}
+          {/* Social proof */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={loaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
             transition={{ duration: 0.6, ease, delay: 0.65 }}
-            className='flex flex-wrap items-center justify-center gap-2'
+            className='flex items-center gap-2.5 rounded-full border border-white/8 bg-white/[0.03] py-2 pl-2 pr-5'
           >
-            {/* Rating pill */}
-            <div className='flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2'>
-              <span className='text-xs font-bold text-theme-400'>★★★★★</span>
-              <span className='h-3 w-px bg-white/10' />
-              <span className='text-xs text-neutral-500'>
-                <NumberTicker className='font-semibold text-neutral-300' value={12000} />
-                <span className='text-neutral-500'>+ clientes</span>
-              </span>
+            {/* Avatars */}
+            <div className='flex items-center'>
+              {['influencer1.jpg', 'influencer2.png', 'influencer3.jpg', 'influencer4.jpg'].map((file, i) => (
+                <div
+                  key={file}
+                  className='relative h-8 w-8 overflow-hidden rounded-full border-2 border-theme-900'
+                  style={{ marginLeft: i === 0 ? 0 : -8 }}
+                >
+                  <Image
+                    src={`/images/influencers/${file}`}
+                    alt={`Influencer ${i + 1}`}
+                    fill
+                    className='object-cover'
+                  />
+                </div>
+              ))}
             </div>
 
-            {/* Divider */}
-            <span className='h-4 w-px bg-white/8 max-sm:hidden' />
-
-            {/* Game tags */}
-            <div className='flex items-center gap-1.5'>
-              {['FiveM', 'CS2', 'Valorant', 'Fortnite', 'Warzone'].map((g) => (
-                <span
-                  key={g}
-                  className='rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[10px] font-medium text-neutral-600'
-                >
-                  {g}
-                </span>
-              ))}
-              <span className='text-[10px] text-neutral-700'>+</span>
+            <div className='flex flex-col'>
+              <span className='text-[11px] font-bold leading-none text-theme-400'>★★★★★</span>
+              <span className='mt-0.5 text-xs leading-none text-neutral-400'>
+                <NumberTicker className='font-semibold text-white' value={12000} />+ clientes
+              </span>
             </div>
           </motion.div>
         </div>

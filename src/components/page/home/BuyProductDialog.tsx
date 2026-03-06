@@ -163,7 +163,7 @@ export const BuyProductDialog = ({
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className='max-h-[90vh] w-full overflow-y-auto border-white/10 bg-theme-800/85 p-0 backdrop-blur-2xl sm:max-w-[425px] md:min-w-[700px] lg:min-w-[1000px] xl:min-w-[1200px] 2xl:min-w-[1400px]'>
+      <DialogContent className='flex w-full flex-col overflow-hidden border-white/10 bg-theme-800/85 p-0 backdrop-blur-2xl sm:max-w-[425px] md:min-w-[700px] lg:min-w-[1000px] xl:min-w-[1200px] 2xl:min-w-[1400px]'>
         {/* Ambient top glow */}
         <div
           aria-hidden
@@ -174,24 +174,24 @@ export const BuyProductDialog = ({
           }}
         />
 
-        {/* ── Header ─────────────────────────────────────────── */}
-        <div className='relative border-b border-white/5 px-8 py-6 pr-14'>
+        {/* ── Header (fixo) ──────────────────────────────────── */}
+        <div className='relative shrink-0 border-b border-white/5 px-8 py-6 pr-14 max-md:px-5 max-md:py-4'>
           <p className='text-[10px] font-bold uppercase tracking-widest text-theme-400'>
             UpBoost
           </p>
-          <h2 className='font-sora mt-1 text-2xl font-bold text-white'>Compra de produto</h2>
-          <p className='mt-0.5 text-sm text-neutral-500'>
-            Ficamos felizes por você optar pela UpBoost. Agradecemos sua confiança.
+          <h2 className='font-sora mt-1 text-2xl font-bold text-white max-md:text-xl'>Finalizar compra</h2>
+          <p className='mt-0.5 text-sm text-neutral-500 max-md:text-xs'>
+            Adicione itens extras e finalize pelo WhatsApp.
           </p>
         </div>
 
-        {/* ── Body ──────────────────────────────────────────── */}
-        <div className='relative flex items-start max-lg:flex-col'>
+        {/* ── Body (scrollável) ──────────────────────────────── */}
+        <div className='relative flex min-h-0 flex-1 overflow-hidden max-lg:flex-col max-lg:overflow-y-auto'>
 
           {/* ── Left: Addons ── */}
-          <div className='flex-1 p-8 max-lg:p-6'>
-            <h3 className='font-sora text-base font-bold text-theme-400'>
-              Adicione mais um item e complemente sua otimização
+          <div className='flex-1 p-8 max-lg:p-5 lg:overflow-y-auto'>
+            <h3 className='font-sora text-base font-bold text-theme-400 max-md:text-sm'>
+              Complemente sua otimização
             </h3>
 
             {/* 2-col grid */}
@@ -341,8 +341,8 @@ export const BuyProductDialog = ({
           <div className='hidden w-px self-stretch bg-white/5 lg:block' />
 
           {/* ── Right: Summary ── */}
-          <div className='w-full p-8 max-lg:border-t max-lg:border-white/5 max-lg:p-6 lg:w-80 lg:shrink-0 xl:w-96'>
-            <div className='lg:sticky lg:top-6'>
+          <div className='w-full p-8 max-lg:border-t max-lg:border-white/5 max-lg:p-5 lg:w-80 lg:shrink-0 lg:overflow-y-auto xl:w-96'>
+            <div>
               <h3 className='font-sora text-base font-bold text-white'>Resumo da compra</h3>
 
               {/* Plan card */}

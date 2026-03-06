@@ -11,7 +11,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 const stats = [
   { prefix: '+', value: 200, suffix: ' FPS', label: 'de ganho médio' },
-  { prefix: '+', value: 4000, suffix: '', label: 'clientes' },
+  { prefix: '+', value: 12000, suffix: '', label: 'clientes' },
   { prefix: '-', value: 10, suffix: ' ms', label: 'de input lag' },
   { prefix: '+', value: 10, suffix: ' países', label: 'atendidos' },
 ];

@@ -32,16 +32,16 @@ const BentoCard = ({
 
 // ── Inner mock UI components ───────────────────────────────────────────────────
 
-const toggleItems = [
-  'Desativar processos em background',
-  'Limpar arquivos temporários',
-  'Otimizar registro do Windows',
+const killedProcesses = [
+  { name: 'SysMain.exe',        cpu: '3.2%', ram: '187 MB', status: 'KILLED' },
+  { name: 'SearchIndexer.exe',  cpu: '1.8%', ram: '124 MB', status: 'KILLED' },
+  { name: 'GameBarPresenceW…',  cpu: '0.9%', ram: '89 MB',  status: 'KILLED' },
 ];
 
 const fpsItems = [
-  { icon: Cpu, label: 'FREE RAM', time: 'há 2h' },
-  { icon: Zap, label: 'JUNK REMOVIDO', time: 'há 3h' },
-  { icon: Globe, label: 'INPUT AJUSTADO', time: 'há 5h' },
+  { icon: Cpu, label: 'RAM FREED — 4.2 GB', time: 'há 2h' },
+  { icon: Zap, label: 'PREFETCH FLUSHED', time: 'há 3h' },
+  { icon: Globe, label: 'INTERRUPT AFFINITY SET', time: 'há 5h' },
 ];
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -61,7 +61,7 @@ export const CallToAction = () => (
           Por que escolher a <span className='text-theme-400'>UPBOOST</span>?
         </h2>
         <p className='mt-2 text-sm text-neutral-400'>
-          Cada ajuste conta. Veja o que fazemos pelo seu PC.
+          Tweaks reais no kernel, registro e scheduler. Veja o que executamos no seu sistema.
         </p>
       </motion.div>
 
@@ -79,35 +79,44 @@ export const CallToAction = () => (
             Sistema
           </p>
           <h3 className='mt-1 font-sora text-2xl font-bold text-white'>
-            Otimização completa do sistema
+            Otimização a nível de sistema
           </h3>
           <p className='mt-1 text-sm text-neutral-400'>
-            Processos, registros e serviços ajustados para a performance máxima
-            do seu hardware.
+            Desabilitamos services desnecessários, ajustamos prioridade de CPU e limpamos o pipeline do Windows.
           </p>
 
-          <div className='mt-6 space-y-2.5'>
-            {toggleItems.map((item, i) => (
+          {/* Mock task manager */}
+          <div className='mt-6 overflow-hidden rounded-2xl border border-white/6 bg-theme-900'>
+            {/* Header row */}
+            <div className='grid grid-cols-[1fr_52px_72px_64px] border-b border-white/5 px-4 py-2'>
+              <span className='text-[10px] font-bold uppercase tracking-widest text-neutral-600'>Processo</span>
+              <span className='text-[10px] font-bold uppercase tracking-widest text-neutral-600'>CPU</span>
+              <span className='text-[10px] font-bold uppercase tracking-widest text-neutral-600'>Memória</span>
+              <span className='text-[10px] font-bold uppercase tracking-widest text-neutral-600'>Status</span>
+            </div>
+            {killedProcesses.map((p, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -8 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, ease, delay: 0.2 + i * 0.09 }}
-                className='border-white/6 flex items-center justify-between rounded-2xl border bg-theme-900 px-4 py-3'
+                transition={{ duration: 0.35, ease, delay: 0.2 + i * 0.1 }}
+                className='grid grid-cols-[1fr_52px_72px_64px] items-center border-b border-white/5 px-4 py-2.5 last:border-0'
               >
-                <div className='flex items-center gap-3'>
-                  <Zap className='h-3.5 w-3.5 shrink-0 text-theme-400' />
-                  <span className='text-xs font-medium uppercase tracking-wide text-neutral-300'>
-                    {item}
-                  </span>
-                </div>
-                {/* Toggle pill */}
-                <div className='relative h-5 w-9 shrink-0 rounded-full bg-theme-400'>
-                  <div className='absolute right-0.5 top-0.5 h-4 w-4 rounded-full bg-theme-900' />
-                </div>
+                <span className='truncate font-mono text-xs text-neutral-300'>{p.name}</span>
+                <span className='font-mono text-xs text-red-400'>{p.cpu}</span>
+                <span className='font-mono text-xs text-neutral-400'>{p.ram}</span>
+                <span className='inline-flex items-center gap-1 text-[10px] font-bold text-theme-400'>
+                  <span className='h-1.5 w-1.5 rounded-full bg-theme-400' />
+                  {p.status}
+                </span>
               </motion.div>
             ))}
+            {/* Freed total */}
+            <div className='flex items-center justify-between border-t border-white/8 bg-theme-400/5 px-4 py-2.5'>
+              <span className='text-[11px] text-neutral-500'>RAM liberada</span>
+              <span className='font-mono text-sm font-bold text-theme-400'>+ 400 MB</span>
+            </div>
           </div>
         </motion.div>
 
@@ -123,10 +132,10 @@ export const CallToAction = () => (
             Performance
           </p>
           <h3 className='mt-1 font-sora text-2xl font-bold text-white'>
-            +FPS Garantido
+            +FPS no frametime
           </h3>
           <p className='mt-1 text-sm text-neutral-400'>
-            Do básico ao avançado, cada ajuste maximiza seus frames por segundo.
+            GPU scheduling, power plan e driver tweaks para eliminar frametime spikes e stutters.
           </p>
 
           <div className='mt-6 space-y-0.5'>
@@ -164,10 +173,10 @@ export const CallToAction = () => (
             Atendimento
           </p>
           <h3 className='mt-1 font-sora text-2xl font-bold text-white'>
-            100% Remoto
+            Acesso remoto seguro
           </h3>
           <p className='mt-1 text-sm text-neutral-400'>
-            Via AnyDesk, sem sair de casa. Rápido, seguro e sem complicação.
+            Sessão via AnyDesk com permissão controlada. Você acompanha cada comando em tempo real.
           </p>
 
           <div className='border-white/6 mt-6 rounded-2xl border bg-theme-900 p-4'>
@@ -211,11 +220,10 @@ export const CallToAction = () => (
             Latência
           </p>
           <h3 className='mt-1 font-sora text-2xl font-bold text-white'>
-            Zero Input Lag
+            Input lag reduzido
           </h3>
           <p className='mt-1 text-sm text-neutral-400'>
-            Comandos mais rápidos e precisos para jogar no limite do seu
-            potencial.
+            Ajuste de IRQ, DPC latency e polling rate para resposta de periférico abaixo de 1ms.
           </p>
 
           <div className='mt-6 space-y-5'>
@@ -279,10 +287,10 @@ export const CallToAction = () => (
               <ShoppingCart className='h-4 w-4 text-theme-400' />
             </div>
             <h3 className='font-sora text-2xl font-bold text-white'>
-              Pronto para turbinar seu PC?
+              Seu PC roda abaixo do potencial
             </h3>
             <p className='mt-2 text-sm text-neutral-400'>
-              Junte-se a mais de 12.000 clientes que já jogam no próximo nível.
+              +12.000 sistemas otimizados. FPS, latência e estabilidade — tudo ajustado pro seu hardware.
             </p>
           </div>
 

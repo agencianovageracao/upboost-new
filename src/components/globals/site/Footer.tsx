@@ -209,11 +209,11 @@ export const Footer = () => (
             </p>
             <div className='flex flex-col gap-3'>
               <Link
-                href='mailto:support@upboost.pro'
+                href='mailto:support@upboostbusiness.com.br'
                 className='group inline-flex items-center gap-2.5 text-sm text-neutral-400 transition-colors hover:text-white'
               >
                 <Mail className='h-3.5 w-3.5 shrink-0 text-neutral-600 transition-colors group-hover:text-theme-400' />
-                support@upboost.pro
+                support@upboostbusiness.com.br
               </Link>
               <Link
                 href='https://api.whatsapp.com/send?phone=+556592952018&text=Olá😀!+Gostaria+de+saber+mais+sobre+a+UPBOOST'

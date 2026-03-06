@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 import { PageView } from '../lib/fbpixel';
 import { Title } from '@/components/globals/site/Title';
 import { CallToAction } from '@/components/page/home/CallToAction';
+import { FreeAnalysisWidget } from '@/components/globals/site/FreeAnalysisWidget';
 
 // ssr: false — Safari iOS decide bloquear autoplay ao parsear o HTML inicial.
 // Como o React não inclui o atributo `muted` no SSR (bug conhecido), o Safari
@@ -60,6 +61,7 @@ export default function Home() {
         </div>
       </main>
       <Footer />
+      <FreeAnalysisWidget />
     </>
   );
 }
