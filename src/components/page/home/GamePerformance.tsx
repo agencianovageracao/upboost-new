@@ -166,7 +166,7 @@ export const GamePerformance = () => {
     const clip = `inset(0 ${100 - pos}% 0 0)`;
     if (clipRef.current) {
       clipRef.current.style.clipPath = clip;
-      clipRef.current.style.webkitClipPath = clip;
+      (clipRef.current.style as CSSStyleDeclaration & { webkitClipPath: string }).webkitClipPath = clip;
     }
     if (dividerRef.current) dividerRef.current.style.left = `${pos}%`;
     if (labelLeftRef.current)
