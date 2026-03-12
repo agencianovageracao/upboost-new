@@ -3,13 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-
-const hints = [
-  'Otimizando performance do sistema...',
-  'Calibrando parâmetros de rede...',
-  'Carregando módulos de boost...',
-  'Sincronizando configurações...',
-];
+import { useTranslations } from 'next-intl';
 
 const corners = [
   'top-6 left-6 border-l-2 border-t-2',
@@ -19,6 +13,8 @@ const corners = [
 ];
 
 export const LoadingScreen = ({ onDone }: { onDone: () => void }) => {
+  const t = useTranslations('LoadingScreen');
+  const hints = [t('hint1'), t('hint2'), t('hint3'), t('hint4')];
   const [done, setDone] = useState(false);
   const [hintIndex, setHintIndex] = useState(0);
 
@@ -118,7 +114,7 @@ export const LoadingScreen = ({ onDone }: { onDone: () => void }) => {
                 Up<span className='font-thin'>Boost</span>
               </h1>
               <p className='mt-2 text-[10px] uppercase tracking-[0.35em] text-neutral-600'>
-                Performance real. Resultados comprovados.
+                {t('tagline')}
               </p>
             </div>
           </motion.div>

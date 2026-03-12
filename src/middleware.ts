@@ -1,39 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 import { addViewToUser, getUserProfile } from './functions/user';
 import type { UserType } from './types/user';
+import { routing } from './i18n/routing';
 
-// This function can be marked `async` if using `await` inside
+const intlMiddleware = createMiddleware(routing);
+
 export async function middleware(request: NextRequest) {
-  if (request.url.includes('/auth')) {
+  const { pathname } = request.nextUrl;
+
+  // ── Auth routes (no i18n) ──────────────────────────────────────────────────
+  if (pathname.startsWith('/auth')) {
     const token = request.cookies.get('auth-token');
     const user = request.cookies.get('auth-user');
-
     if (!!token && !!user) {
       return NextResponse.redirect(new URL('/panel', request.url));
     }
+    return NextResponse.next();
   }
 
-  if (
-    !!request.nextUrl.searchParams.get('coupon') &&
-    request.nextUrl.pathname === '/'
-  ) {
-    const coupon = request.nextUrl.searchParams.get('coupon');
-
-    if (!!coupon) {
-      await addViewToUser(coupon);
-
-      let nextUrl = request.nextUrl;
-      nextUrl.searchParams.delete('coupon');
-
-      const response = NextResponse.redirect(new URL('/', nextUrl));
-
-      response.cookies.set('coupon', coupon);
-
-      return response;
-    }
-  }
-
-  if (request.url.includes('/panel')) {
+  // ── Panel routes (no i18n) ─────────────────────────────────────────────────
+  if (pathname.startsWith('/panel')) {
     const token = request.cookies.get('auth-token');
     const user = request.cookies.get('auth-user');
 
@@ -48,24 +35,36 @@ export async function middleware(request: NextRequest) {
     }
 
     let response = NextResponse.next();
-
     response.cookies.set('auth-user', JSON.stringify(userUpdated));
 
-    if (request.url.includes('/panel/admin')) {
+    if (pathname.startsWith('/panel/admin')) {
       const userString = request.cookies.get('auth-user');
-
-      const user: UserType = JSON.parse(userString?.value || '');
-
-      if (user.role !== 'ADMIN') {
+      const parsedUser: UserType = JSON.parse(userString?.value || '');
+      if (parsedUser.role !== 'ADMIN') {
         return NextResponse.redirect(new URL('/panel', request.url));
       }
     }
 
     return response;
   }
+
+  // ── Coupon redirect (PT root and EN root) ──────────────────────────────────
+  const coupon = request.nextUrl.searchParams.get('coupon');
+  if (coupon && (pathname === '/' || pathname === '/en')) {
+    await addViewToUser(coupon);
+    const redirectTo = pathname === '/en' ? '/en' : '/';
+    const nextUrl = new URL(redirectTo, request.url);
+    const response = NextResponse.redirect(nextUrl);
+    response.cookies.set('coupon', coupon);
+    return response;
+  }
+
+  // ── i18n middleware for everything else ────────────────────────────────────
+  return intlMiddleware(request);
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/panel/:path*', '/panel/admin/:path*', '/auth/:path*', '/'],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon|images|videos|.*\\..*).*)',
+  ],
 };

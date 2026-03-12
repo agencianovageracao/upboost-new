@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 const floatingLogos = [
   {
@@ -67,6 +68,8 @@ const floatingLogos = [
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export const Header = ({ loaded }: { loaded: boolean }) => {
+  const t = useTranslations('Header');
+
   return (
     <>
       <header className='relative bg-theme-900' style={{ paddingTop: 95 }}>
@@ -82,7 +85,6 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
 
         {/* ── Floating logo cards ── */}
         {floatingLogos.map(({ item, ext, pos, rotate, card, logo, delay }) => (
-          /* outer div: absolute position + entrance animation */
           <motion.div
             key={item}
             aria-hidden
@@ -95,7 +97,6 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
             }
             transition={{ duration: 0.6, ease, delay: 0.55 + delay * 0.32 }}
           >
-            {/* inner div: continuous float loop (independent of entrance) */}
             <motion.div
               className='flex items-center justify-center rounded-2xl border border-white/10 bg-theme-700 shadow-lg shadow-black/50'
               style={{ width: card, height: card, rotate }}
@@ -129,7 +130,7 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
             className='inline-flex items-center gap-2 rounded-full border border-theme-400/20 bg-theme-400/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-theme-400'
           >
             <span className='h-1.5 w-1.5 animate-pulse rounded-full bg-theme-400' />
-            ⚡ +12.000 PCs otimizados
+            {t('badge')}
           </motion.span>
 
           {/* H1 */}
@@ -139,11 +140,21 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
             transition={{ duration: 0.65, ease, delay: 0.22 }}
             className='max-w-[680px] font-sora text-6xl font-bold leading-[1.1] tracking-tight max-xl:text-5xl max-lg:text-4xl max-sm:text-[2rem]'
           >
-            Pare de perder{' '}
+            {t('h1_1')}{' '}
             <br className='hidden sm:block' />
-            por culpa do{' '}
-            <span className='text-theme-400'>seu PC.</span>
+            {t('h1_2')}{' '}
+            <span className='text-theme-400'>{t('h1_accent')}</span>
           </motion.h1>
+
+          {/* Slogan */}
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            animate={loaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+            transition={{ duration: 0.6, ease, delay: 0.32 }}
+            className='text-base font-semibold italic text-neutral-300 max-lg:text-sm'
+          >
+            {t('slogan')}
+          </motion.p>
 
           {/* Paragraph */}
           <motion.p
@@ -152,9 +163,7 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
             transition={{ duration: 0.6, ease, delay: 0.37 }}
             className='max-w-[460px] text-sm leading-relaxed text-neutral-400 max-lg:text-xs'
           >
-            Input lag, queda de FPS, stutter no clutch: isso custa rounds. A
-            UPBOOST otimiza seu Windows em até 20 minutos e você sente a
-            diferença na primeira partida.
+            {t('body')}
           </motion.p>
 
           {/* CTA */}
@@ -166,7 +175,7 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
           >
             <Link href='#planos'>
               <ShinyDefaultButton
-                text='Ver planos'
+                text={t('cta')}
                 icon={<ShoppingCart />}
               />
             </Link>
@@ -200,7 +209,7 @@ export const Header = ({ loaded }: { loaded: boolean }) => {
             <div className='flex flex-col'>
               <span className='text-[11px] font-bold leading-none text-theme-400'>★★★★★</span>
               <span className='mt-0.5 text-xs leading-none text-neutral-400'>
-                <NumberTicker className='font-semibold text-white' value={12000} />+ clientes
+                <NumberTicker className='font-semibold text-white' value={12000} />{t('clients')}
               </span>
             </div>
           </motion.div>

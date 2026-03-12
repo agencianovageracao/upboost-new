@@ -1,4 +1,8 @@
 import { withNextVideo } from 'next-video/process';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -37,4 +41,6 @@ const nextConfig = {
   },
 };
 
-export default withNextVideo(nextConfig, { folder: 'public/videos' });
+export default withNextVideo(withNextIntl(nextConfig), {
+  folder: 'public/videos',
+});

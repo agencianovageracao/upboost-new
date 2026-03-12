@@ -4,17 +4,18 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Check, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 const games = [
   {
     id: 'fortnite',
     name: 'Fortnite',
     logo: '/images/tinified/fortnite.png',
-    fpsOn: 240,
-    fpsOff: 150,
-    latOn: '2ms',
+    fpsOn: 550,
+    fpsOff: 250,
+    latOn: '1ms',
     latOff: '25ms',
-    boost: 60,
+    boost: 63,
     videoOn: '/videos/games/fortnite/fortnite-depois.mp4',
     videoOff: '/videos/games/fortnite/fortnite-antes.mp4',
   },
@@ -22,11 +23,11 @@ const games = [
     id: 'fivem',
     name: 'FiveM / GTA V',
     logo: '/images/tinified/fivem.png',
-    fpsOn: 160,
-    fpsOff: 95,
-    latOn: '2ms',
+    fpsOn: 180,
+    fpsOff: 70,
+    latOn: '1ms',
     latOff: '30ms',
-    boost: 68,
+    boost: 57,
     videoOn: '/videos/games/fivem/fivem-depois.mp4',
     videoOff: '/videos/games/fivem/fivem-antes.mp4',
   },
@@ -34,11 +35,12 @@ const games = [
     id: 'bf6',
     name: 'Battlefield 6',
     logo: null,
-    fpsOn: 130,
-    fpsOff: 78,
-    latOn: '3ms',
+    abbr: 'BF6',
+    fpsOn: 160,
+    fpsOff: 40,
+    latOn: '1ms',
     latOff: '32ms',
-    boost: 67,
+    boost: 84,
     videoOn: '/videos/games/bf6/bf6-depois.mp4',
     videoOff: '/videos/games/bf6/bf6-antes.mp4',
   },
@@ -47,20 +49,46 @@ const games = [
     name: 'Valorant',
     logo: '/images/tinified/valorant.png',
     invertLogo: true,
-    fpsOn: 320,
-    fpsOff: 190,
+    fpsOn: 590,
+    fpsOff: 200,
     latOn: '1ms',
     latOff: '18ms',
-    boost: 68,
+    boost: 76,
     videoOn: '/videos/games/valorant/valorant-depois.mp4',
     videoOff: '/videos/games/valorant/valorant-antes.mp4',
   },
+  {
+    id: 'warzone',
+    name: 'Warzone',
+    logo: '/images/tinified/warzone.png',
+    fpsOn: 180,
+    fpsOff: 46,
+    latOn: '1ms',
+    latOff: '28ms',
+    boost: 98,
+    videoOn: '/videos/games/warzone/warzone-depois.mp4',
+    videoOff: '/videos/games/warzone/warzone-antes.mp4',
+  },
+  {
+    id: 'r6',
+    name: 'Rainbow Six Siege',
+    logo: null,
+    abbr: 'R6',
+    fpsOn: 240,
+    fpsOff: 66,
+    latOn: '1ms',
+    latOff: '22ms',
+    boost: 94,
+    videoOn: '/videos/games/r6/r6-depois.mp4',
+    videoOff: '/videos/games/r6/r6-antes.mp4',
+  },
 ];
 
-const MAX_FPS = 380;
+const MAX_FPS = 600;
 
 export const GamePerformance = () => {
-  const [selectedId, setSelectedId] = useState('fivem');
+  const t = useTranslations('GamePerformance');
+  const [selectedId, setSelectedId] = useState('fortnite');
   const [open, setOpen] = useState(false);
   const [sliderPos, setSliderPos] = useState(50);
 
@@ -71,7 +99,6 @@ export const GamePerformance = () => {
   const videoOnRef = useRef<HTMLVideoElement | null>(null);
   const videoOffRef = useRef<HTMLVideoElement | null>(null);
 
-  // Refs para manipulação direta do DOM durante drag (sem re-renders)
   const clipRef = useRef<HTMLDivElement>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
   const labelLeftRef = useRef<HTMLDivElement>(null);
@@ -83,7 +110,6 @@ export const GamePerformance = () => {
   const play = useCallback((el: HTMLVideoElement | null) => {
     if (!el) return;
     el.play().catch(() => {
-      // Safari iOS pode rejeitar play() antes do vídeo estar pronto
       const onReady = () => el.play().catch(() => {});
       el.addEventListener('canplay', onReady, { once: true });
     });
@@ -100,7 +126,6 @@ export const GamePerformance = () => {
       el.setAttribute('muted', '');
       el.setAttribute('playsinline', '');
       el.setAttribute('webkit-playsinline', '');
-      // Não chamar el.load() — isso cancela o autoPlay nativo no Safari iOS
       el.play().catch(() => {
         el.addEventListener('canplay', () => el.play().catch(() => {}), {
           once: true,
@@ -132,7 +157,6 @@ export const GamePerformance = () => {
     [setup]
   );
 
-  // Pausa quando sai da viewport, retoma quando volta
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -150,7 +174,6 @@ export const GamePerformance = () => {
     return () => observer.disconnect();
   }, [play]);
 
-  // Fallback: Safari iOS pode bloquear autoplay até a primeira interação
   useEffect(() => {
     const playAll = () => {
       play(videoOnRef.current);
@@ -160,7 +183,6 @@ export const GamePerformance = () => {
     return () => document.removeEventListener('touchstart', playAll);
   }, [play]);
 
-  // Atualiza DOM diretamente sem re-render — essencial pra fluidez no mobile
   const applyPos = useCallback((pos: number) => {
     posRef.current = pos;
     const clip = `inset(0 ${100 - pos}% 0 0)`;
@@ -183,7 +205,6 @@ export const GamePerformance = () => {
     );
   }, []);
 
-  // Touch events nativos — mais confiáveis que pointer events no iOS
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -205,7 +226,7 @@ export const GamePerformance = () => {
         moved = true;
         setDragging(true);
       }
-      e.preventDefault(); // Bloqueia scroll durante o arrasto
+      e.preventDefault();
       applyPos(calcPos(touch.clientX));
     };
 
@@ -229,10 +250,9 @@ export const GamePerformance = () => {
     };
   }, [applyPos, calcPos]);
 
-  // Mouse events para desktop (pointer events)
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
-      if (e.pointerType === 'touch') return; // Touch é tratado acima
+      if (e.pointerType === 'touch') return;
       isDragging.current = true;
       setDragging(true);
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -257,7 +277,6 @@ export const GamePerformance = () => {
     setDragging(false);
   }, []);
 
-  // Fecha o dropdown ao clicar fora
   const selectRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
@@ -276,10 +295,10 @@ export const GamePerformance = () => {
         {/* Header */}
         <div className='mb-8 text-center'>
           <h2 className='font-sora text-3xl font-bold max-lg:text-2xl'>
-            Performance <span className='text-theme-400'>comprovada</span>
+            {t('title')} <span className='text-theme-400'>{t('title_accent')}</span>
           </h2>
           <p className='mt-2 text-sm text-neutral-400'>
-            Selecione o jogo e arraste a linha para comparar
+            {t('subtitle')}
           </p>
         </div>
 
@@ -311,7 +330,7 @@ export const GamePerformance = () => {
                 <source src={game.videoOff} type='video/mp4' />
               </video>
 
-              {/* Com UPBOOST — clip-path no wrapper div, não no <video> (bug Safari iOS) */}
+              {/* Com UPBOOST */}
               <div
                 ref={clipRef}
                 className='absolute inset-0'
@@ -351,11 +370,10 @@ export const GamePerformance = () => {
                   <ChevronLeft className='-mr-0.5 h-3.5 w-3.5 text-white md:h-4 md:w-4' />
                   <ChevronRight className='-ml-0.5 h-3.5 w-3.5 text-white md:h-4 md:w-4' />
                 </div>
-                {/* Área de toque expandida no mobile */}
                 <div className='pointer-events-auto absolute h-full w-12 cursor-ew-resize md:hidden' />
               </div>
 
-              {/* Labels — sumem quando o slider passa por cima */}
+              {/* Labels */}
               <div
                 ref={labelLeftRef}
                 className='pointer-events-none absolute inset-y-0 left-0 z-10 overflow-hidden'
@@ -364,7 +382,7 @@ export const GamePerformance = () => {
                 <div className='absolute left-2 top-2 flex items-center gap-1.5 rounded-lg border border-theme-400/20 bg-theme-900/80 px-2 py-1 backdrop-blur-sm md:left-3 md:top-3 md:px-2.5'>
                   <div className='h-1.5 w-1.5 rounded-full bg-theme-400' />
                   <span className='whitespace-nowrap text-[10px] font-bold text-theme-400 md:text-xs'>
-                    Com UPBOOST
+                    {t('with_upboost')}
                   </span>
                 </div>
               </div>
@@ -376,20 +394,14 @@ export const GamePerformance = () => {
                 <div className='absolute right-2 top-2 flex items-center gap-1.5 rounded-lg border border-white/10 bg-theme-900/80 px-2 py-1 backdrop-blur-sm md:right-3 md:top-3 md:px-2.5'>
                   <div className='h-1.5 w-1.5 rounded-full bg-neutral-500' />
                   <span className='whitespace-nowrap text-[10px] text-neutral-400 md:text-xs'>
-                    Sem UPBOOST
+                    {t('without_upboost')}
                   </span>
                 </div>
               </div>
             </div>
-
-            {/* Footnote */}
-            <p className='mt-3 text-xs text-neutral-700 max-md:text-center'>
-              Testado com Intel i7-13700K (5.2ghz), RTX 4070 (stock), 32gb DDR5
-              — Resultados podem variar.
-            </p>
           </div>
 
-          {/* Coluna direita — Select + Cards (2 partes) */}
+          {/* Coluna direita — Select + Cards */}
           <div className='col-span-2 flex flex-col gap-3 max-md:col-span-1'>
             {/* Game select */}
             <div ref={selectRef} className='relative w-full'>
@@ -408,7 +420,7 @@ export const GamePerformance = () => {
                     />
                   ) : (
                     <span className='text-[10px] font-bold text-neutral-300'>
-                      BF6
+                      {'abbr' in game ? game.abbr : ''}
                     </span>
                   )}
                 </div>
@@ -453,7 +465,7 @@ export const GamePerformance = () => {
                               />
                             ) : (
                               <span className='text-[10px] font-bold text-neutral-300'>
-                                BF6
+                                {'abbr' in g ? g.abbr : ''}
                               </span>
                             )}
                           </div>
@@ -473,11 +485,10 @@ export const GamePerformance = () => {
               </AnimatePresence>
             </div>
 
-            {/* Cards informativos — empilhados verticalmente */}
-            {/* Boost */}
+            {/* Boost card */}
             <div className='flex flex-1 flex-col justify-center rounded-xl border border-white/5 bg-theme-800 px-5 py-4'>
               <p className='mb-1 text-[11px] uppercase tracking-wider text-neutral-500'>
-                Performance
+                {t('boost_label')}
               </p>
               <AnimatePresence mode='wait'>
                 <motion.p
@@ -492,20 +503,20 @@ export const GamePerformance = () => {
                 </motion.p>
               </AnimatePresence>
               <p className='mt-0.5 text-xs text-neutral-500'>
-                aumento médio de FPS
+                {t('boost_sub')}
               </p>
             </div>
 
             {/* FPS bars */}
             <div className='flex flex-1 flex-col justify-center rounded-xl border border-white/5 bg-theme-800 px-5 py-4'>
               <p className='mb-3 text-[11px] uppercase tracking-wider text-neutral-500'>
-                Frames por segundo
+                {t('fps_label')}
               </p>
               <div className='flex flex-col gap-3'>
                 <div>
                   <div className='mb-1.5 flex items-center justify-between'>
                     <span className='text-xs font-semibold text-white'>
-                      Com UPBOOST
+                      {t('with_upboost')}
                     </span>
                     <span className='text-xs font-bold text-theme-400'>
                       {game.fpsOn} FPS
@@ -524,7 +535,7 @@ export const GamePerformance = () => {
                 <div>
                   <div className='mb-1.5 flex items-center justify-between'>
                     <span className='text-xs text-neutral-500'>
-                      Sem UPBOOST
+                      {t('without_upboost')}
                     </span>
                     <span className='text-xs text-neutral-500'>
                       {game.fpsOff} FPS
@@ -546,18 +557,18 @@ export const GamePerformance = () => {
             {/* Latency */}
             <div className='flex flex-1 flex-col justify-center rounded-xl border border-white/5 bg-theme-800 px-5 py-4'>
               <p className='mb-3 text-[11px] uppercase tracking-wider text-neutral-500'>
-                Latência
+                {t('latency_label')}
               </p>
               <div className='flex items-end justify-between'>
                 <div>
-                  <p className='text-[11px] text-neutral-500'>Com UPBOOST</p>
+                  <p className='text-[11px] text-neutral-500'>{t('with_upboost')}</p>
                   <p className='font-sora text-2xl font-bold text-theme-400'>
                     {game.latOn}
                   </p>
                 </div>
                 <div className='mb-1 text-xs text-neutral-700'>vs</div>
                 <div className='text-right'>
-                  <p className='text-[11px] text-neutral-500'>Sem UPBOOST</p>
+                  <p className='text-[11px] text-neutral-500'>{t('without_upboost')}</p>
                   <p className='font-sora text-2xl font-bold text-neutral-600'>
                     {game.latOff}
                   </p>
@@ -566,6 +577,10 @@ export const GamePerformance = () => {
             </div>
           </div>
         </div>
+
+        <p className='mt-5 text-center text-[11px] text-neutral-700'>
+          {t('disclaimer')}
+        </p>
       </div>
     </section>
   );

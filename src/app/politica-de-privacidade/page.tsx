@@ -1,122 +1,140 @@
 import { Footer } from '@/components/globals/site/Footer';
 import { Navbar } from '@/components/globals/site/Navbar';
 
+export const metadata = {
+  title: 'Política de Privacidade — UpBoost',
+};
+
 export default function PrivacyPolicy() {
   return (
     <>
-      <header className='bg-theme-800 py-10'>
+      <header className='bg-theme-900 pt-24 pb-16'>
         <Navbar />
-        <div className='flex flex-col items-center justify-center py-20 text-center'>
-          <h1 className='text-3xl font-bold text-theme-400'>
+        <div className='container flex flex-col items-center justify-center text-center'>
+          <h1 className='font-sora text-4xl font-bold text-theme-400 max-sm:text-3xl'>
             Política de Privacidade
           </h1>
-          <p className='text-lg text-neutral-200'>{'UpBoost > Termos'}</p>
+          <p className='mt-2 text-sm text-neutral-500'>UpBoost › Política de Privacidade</p>
         </div>
       </header>
-      <main className='container flex flex-col gap-3 py-20'>
-        <h1 className='text-2xl font-bold text-theme-400'>
-          Política de Privacidade - UpBoost
-        </h1>
 
-        <p>
-          Esta Política de Privacidade descreve como a UpBoost coleta, usa,
-          compartilha e protege as informações fornecidas pelos usuários ao
-          utilizar os serviços de otimização de PCs. A UpBoost está comprometida
-          em garantir a privacidade e segurança dos dados dos usuários, adotando
-          as melhores práticas para proteger a confidencialidade das
-          informações.
-        </p>
+      <main className='bg-theme-800'>
+        <div className='pointer-events-none h-px bg-gradient-to-r from-transparent via-white/10 to-transparent' />
+        <div className='container max-w-3xl py-16 flex flex-col gap-10'>
 
-        <h1 className='text-lg text-theme-400'>Dados Coletados</h1>
+          <section className='rounded-2xl border border-white/[0.07] bg-theme-900/60 px-8 py-6 max-sm:px-5'>
+            <p className='text-sm leading-relaxed text-neutral-400'>
+              A <strong className='text-white'>UpBoost</strong> valoriza a privacidade e a segurança
+              das informações de seus usuários e clientes. Todas as informações coletadas são tratadas
+              com responsabilidade e utilizadas apenas para finalidades legítimas relacionadas à
+              prestação dos serviços.
+            </p>
+          </section>
 
-        <p className='text-sm text-neutral-200'>
-          A UpBoost não coleta informações pessoais dos clientes. Os dados
-          coletados durante a execução dos serviços de otimização são limitados
-          a informações relacionadas ao desempenho do sistema e à configuração
-          do computador, necessários para a realização do serviço de otimização,
-          incluindo:
-        </p>
-        <p className='text-sm text-neutral-200'>
-          Informações técnicas do sistema operacional e especificações de
-          hardware do PC. Registros de desempenho, como FPS, temperatura e input
-          lag, apenas para otimização e análise de desempenho. Finalidade do Uso
-          dos Dados
-        </p>
+          {sections.map(({ title, content }, i) => (
+            <section key={i} className='flex flex-col gap-3'>
+              <h2 className='font-sora text-base font-semibold text-theme-400'>
+                <span className='mr-2 text-neutral-600'>{i + 1}.</span>
+                {title}
+              </h2>
+              <div className='flex flex-col gap-2 text-sm leading-relaxed text-neutral-400'>
+                {content}
+              </div>
+            </section>
+          ))}
 
-        <h1 className='text-lg text-theme-400'>
-          Os dados técnicos são coletados com o objetivo de:
-        </h1>
-
-        <p className='text-sm text-neutral-200'>
-          Realizar os serviços de otimização no sistema do cliente, como
-          melhoria de desempenho, ajuste de temperatura e remoção de input lag.
-          Verificar a eficácia da otimização e garantir que ela se mantenha
-          conforme o esperado. Segurança dos Dados
-        </p>
-
-        <p className='text-sm text-neutral-200'>
-          A UpBoost realiza todos os serviços remotamente e de forma segura.
-          Para garantir a proteção dos dados, todas as interações e atendimentos
-          realizados são gravados e armazenados em nuvem, seguindo rigorosos
-          padrões de segurança para evitar acesso não autorizado, perda ou uso
-          indevido.
-        </p>
-        <h1 className='text-lg text-theme-400'>Compartilhamento de Dados</h1>
-
-        <p className='text-sm text-neutral-200'>
-          A UpBoost não compartilha dados técnicos com terceiros, exceto quando
-          necessário para:
-        </p>
-
-        <p className='text-sm text-neutral-200'>
-          Cumprir com obrigações legais ou regulatórias. Proteger a segurança e
-          integridade dos sistemas dos usuários. Armazenar dados em serviços de
-          nuvem seguros, exclusivamente para fins de registro e monitoramento do
-          atendimento. Retenção de Dados
-        </p>
-
-        <p className='text-sm text-neutral-200'>
-          Os dados coletados são armazenados por até 30 dias após a conclusão do
-          serviço de otimização, sendo usados apenas para fins de verificação da
-          eficácia do serviço. Após esse período, os dados são removidos, exceto
-          quando exigido por motivos legais ou de segurança.
-        </p>
-        <h1 className='text-lg text-theme-400'>Direitos dos Usuários</h1>
-
-        <p className='text-sm text-neutral-200'>
-          Embora a UpBoost não colete informações pessoais, os usuários têm o
-          direito de:
-        </p>
-
-        <p className='text-sm text-neutral-200'>
-          Solicitar informações sobre o tratamento de seus dados técnicos, como
-          desempenho e configuração do sistema. Solicitar esclarecimentos ou
-          remoção de dados relacionados aos atendimentos prestados, dentro do
-          prazo de retenção. Alterações na Política de Privacidade
-        </p>
-
-        <p className='text-sm text-neutral-200'>
-          A UpBoost pode atualizar esta Política de Privacidade periodicamente.
-          Alterações significativas serão publicadas nesta página e, quando
-          necessário, notificadas aos usuários.
-        </p>
-        <h1 className='text-lg text-theme-400'>Contato</h1>
-
-        <p className='text-sm text-neutral-200'>
-          Caso tenha dúvidas sobre esta Política de Privacidade ou deseje mais
-          informações, entre em contato:
-        </p>
-        <p className='text-sm text-neutral-200'>
-          E-mail: upboostpro@gmail.com Telefone: +55 65 9295-2018 Endereço: R.
-          Comendador Henrique, Dom Aquino - Cuiabá, MT, 78015-050
-        </p>
-
-        <p className='text-sm text-neutral-200'>
-          Ao utilizar os serviços da UpBoost, você concorda com esta Política de
-          Privacidade e com o uso dos dados técnicos conforme descrito acima.
-        </p>
+          <p className='border-t border-white/5 pt-8 text-xs text-neutral-600'>
+            Ao contratar qualquer serviço da UpBoost, você declara estar ciente e de acordo com esta
+            Política de Privacidade.
+          </p>
+        </div>
+        <div className='pointer-events-none h-px bg-gradient-to-r from-transparent via-white/10 to-transparent' />
       </main>
+
       <Footer />
     </>
   );
 }
+
+const sections: { title: string; content: React.ReactNode }[] = [
+  {
+    title: 'Dados Pessoais Coletados',
+    content: (
+      <>
+        <p>
+          Para a contratação e execução dos serviços, podem ser coletados alguns dados pessoais
+          fornecidos voluntariamente pelo cliente, incluindo:
+        </p>
+        <ul className='ml-5 flex list-disc flex-col gap-1 text-neutral-500'>
+          <li>Nome completo</li>
+          <li>Endereço de e-mail</li>
+          <li>Número de telefone</li>
+          <li>Usuário do Instagram (quando informado)</li>
+          <li>CPF</li>
+        </ul>
+        <p>Essas informações são utilizadas exclusivamente para:</p>
+        <ul className='ml-5 flex list-disc flex-col gap-1 text-neutral-500'>
+          <li>Identificação do cliente</li>
+          <li>Formalização do contrato de prestação de serviço</li>
+          <li>Comunicação durante o atendimento</li>
+          <li>Organização do suporte técnico</li>
+          <li>Cumprimento de obrigações legais ou regulatórias</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    title: 'Dados Técnicos do Computador',
+    content: (
+      <>
+        <p>
+          Durante a execução do serviço também podem ser analisados dados técnicos do computador, como:
+        </p>
+        <ul className='ml-5 flex list-disc flex-col gap-1 text-neutral-500'>
+          <li>Versão do sistema operacional</li>
+          <li>Especificações de hardware</li>
+          <li>Métricas de desempenho do sistema</li>
+        </ul>
+        <p>
+          Essas informações são utilizadas exclusivamente para diagnóstico e execução da otimização
+          do sistema, não sendo utilizadas para outras finalidades.
+        </p>
+      </>
+    ),
+  },
+  {
+    title: 'Compartilhamento de Dados',
+    content: (
+      <>
+        <p>
+          A UpBoost não comercializa, aluga ou compartilha dados pessoais com terceiros, exceto quando
+          necessário para:
+        </p>
+        <ul className='ml-5 flex list-disc flex-col gap-1 text-neutral-500'>
+          <li>Cumprimento de obrigações legais</li>
+          <li>Requisições de autoridades competentes</li>
+          <li>Proteção dos direitos da empresa ou do próprio cliente</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    title: 'Base Legal e Conformidade',
+    content: (
+      <p>
+        Os dados são tratados de acordo com a{' '}
+        <strong className='text-white'>Lei Geral de Proteção de Dados Pessoais (LGPD)</strong>,
+        respeitando os princípios de segurança, transparência, necessidade e finalidade.
+      </p>
+    ),
+  },
+  {
+    title: 'Segurança das Informações',
+    content: (
+      <p>
+        A UpBoost adota medidas técnicas e administrativas razoáveis para proteger os dados contra
+        acesso não autorizado, perda, alteração ou divulgação indevida.
+      </p>
+    ),
+  },
+];

@@ -20,67 +20,32 @@ import {
 import { useCookies } from 'next-client-cookies';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 const messageWhithoutDiscount =
   'https://wa.me/556592952018?text=Ol%C3%A1%2C%20vim%20atrav%C3%A9s%20do%20site%20e%20gostaria%20de%20comprar%20o%20(produto)';
 const messageWithDiscount =
   'https://wa.me/556592952018?text=Ol%C3%A1%2C%20vim%20atrav%C3%A9s%20do%20site%20e%20queria%20comprar%20o%20(produto).%0A%0AEu%20tenho%20tamb%C3%A9m%20um%20cupom%3A%20*(cupom)*.';
 
+type PlanFeatures = {
+  'Otimização básica': boolean;
+  'Otimização intermediária': boolean;
+  'Otimização plus': boolean;
+  'Otimização profissional': boolean;
+  'Limpeza intermediária': boolean;
+  'Limpeza avançada': boolean;
+  'Remoção de input lag': boolean;
+  'Remoção de input delay': boolean;
+  'Ativação do Windows': boolean;
+};
+
 type Plan = {
   name: string;
   description: string | string[];
   discounted_price: number;
   original_price: number;
-  features?: {
-    'Otimização básica': boolean;
-    'Otimização intermediária': boolean;
-    'Otimização plus': boolean;
-    'Otimização profissional': boolean;
-    'Limpeza intermediária': boolean;
-    'Limpeza avançada': boolean;
-    'Remoção de input lag': boolean;
-    'Remoção de input delay': boolean;
-    'Ativação do Windows': boolean;
-  };
+  features?: PlanFeatures;
 };
-
-const items = [
-  {
-    icon: <KeyRound />,
-    title: 'Ativação do windows permanentemente',
-    description: 'Válido para o windows 10 e 11',
-    price: 19.9,
-  },
-  {
-    icon: <ScreenShareOff />,
-    title: 'Formatação padrão',
-    description: 'Válido para o windows 10 e 11',
-    price: 59.9,
-  },
-  {
-    icon: <Laptop2 />,
-    title: 'Formatação profissional',
-    description:
-      'Formatação profissional para o windows otimizado. Necessário PenDrive 4GB, válido windows 10 e 11',
-    price: 99.9,
-  },
-  {
-    icon: <Gamepad2 />,
-    title: 'Remoção de delay para controle',
-    description: 'De 5ms pra 1ms. Qualquer console/controle',
-    price: 35.9,
-  },
-  {
-    title: 'UPBOOST +',
-    description: [
-      'Limpeza pró plus',
-      'Ativação do windows',
-      'Otimizações básicas',
-      'Otimizações na NVIDIA/AMD',
-    ],
-    price: 29.9,
-  },
-];
 
 export const BuyProductDialog = ({
   children,
@@ -89,11 +54,63 @@ export const BuyProductDialog = ({
   children: React.ReactNode;
   selectedPlan: Plan;
 }) => {
+  const t = useTranslations('BuyDialog');
   const [inputValue, setInputValue] = useState('');
   const [selectedAddons, setSelectedAddons] = useState<any[]>([]);
 
   const cookies = useCookies();
   const router = useRouter();
+
+  // Build items with translations
+  const items = [
+    {
+      icon: <KeyRound />,
+      title: t('addon1_title'),
+      description: t('addon1_desc'),
+      price: 19.9,
+    },
+    {
+      icon: <ScreenShareOff />,
+      title: t('addon2_title'),
+      description: t('addon2_desc'),
+      price: 59.9,
+    },
+    {
+      icon: <Laptop2 />,
+      title: t('addon3_title'),
+      description: t('addon3_desc'),
+      price: 99.9,
+    },
+    {
+      icon: <Gamepad2 />,
+      title: t('addon4_title'),
+      description: t('addon4_desc'),
+      price: 35.9,
+    },
+    {
+      title: t('upboost_plus_title'),
+      description: [
+        t('upboost_desc_1'),
+        t('upboost_desc_2'),
+        t('upboost_desc_3'),
+        t('upboost_desc_4'),
+      ],
+      price: 29.9,
+    },
+  ];
+
+  // Map internal Portuguese feature keys to translated display names
+  const featureDisplayName: Record<string, string> = {
+    'Otimização básica': t('feature_basic'),
+    'Otimização intermediária': t('feature_intermediate'),
+    'Otimização plus': t('feature_plus'),
+    'Otimização profissional': t('feature_professional'),
+    'Limpeza intermediária': t('feature_cleanup_intermediate'),
+    'Limpeza avançada': t('feature_cleanup_advanced'),
+    'Remoção de input lag': t('feature_input_lag'),
+    'Remoção de input delay': t('feature_input_delay'),
+    'Ativação do Windows': t('feature_windows_activation'),
+  };
 
   const subTotal =
     selectedPlan.discounted_price +
@@ -163,7 +180,7 @@ export const BuyProductDialog = ({
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className='flex w-full flex-col overflow-hidden border-white/10 bg-theme-800/85 p-0 backdrop-blur-2xl sm:max-w-[425px] md:min-w-[700px] lg:min-w-[1000px] xl:min-w-[1200px] 2xl:min-w-[1400px]'>
+      <DialogContent className='flex w-full flex-col overflow-hidden border-white/10 bg-theme-800/85 p-0 backdrop-blur-2xl h-[90dvh] sm:max-w-[425px] md:min-w-[700px] lg:min-w-[1000px] xl:min-w-[1200px] 2xl:min-w-[1400px]'>
         {/* Ambient top glow */}
         <div
           aria-hidden
@@ -174,24 +191,24 @@ export const BuyProductDialog = ({
           }}
         />
 
-        {/* ── Header (fixo) ──────────────────────────────────── */}
+        {/* ── Header ──────────────────────────────────────────── */}
         <div className='relative shrink-0 border-b border-white/5 px-8 py-6 pr-14 max-md:px-5 max-md:py-4'>
           <p className='text-[10px] font-bold uppercase tracking-widest text-theme-400'>
             UpBoost
           </p>
-          <h2 className='font-sora mt-1 text-2xl font-bold text-white max-md:text-xl'>Finalizar compra</h2>
+          <h2 className='font-sora mt-1 text-2xl font-bold text-white max-md:text-xl'>{t('title')}</h2>
           <p className='mt-0.5 text-sm text-neutral-500 max-md:text-xs'>
-            Adicione itens extras e finalize pelo WhatsApp.
+            {t('subtitle')}
           </p>
         </div>
 
-        {/* ── Body (scrollável) ──────────────────────────────── */}
+        {/* ── Body ──────────────────────────────────────────────── */}
         <div className='relative flex min-h-0 flex-1 overflow-hidden max-lg:flex-col max-lg:overflow-y-auto'>
 
           {/* ── Left: Addons ── */}
           <div className='flex-1 p-8 max-lg:p-5 lg:overflow-y-auto'>
             <h3 className='font-sora text-base font-bold text-theme-400 max-md:text-sm'>
-              Complemente sua otimização
+              {t('complement_title')}
             </h3>
 
             {/* 2-col grid */}
@@ -228,7 +245,7 @@ export const BuyProductDialog = ({
                       {/* Badge "Popular" no primeiro card */}
                       {index === 0 && (
                         <span className='mb-2 inline-flex items-center gap-1 rounded-full border border-theme-400/25 bg-theme-400/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-theme-400'>
-                          ★ Popular
+                          {t('popular')}
                         </span>
                       )}
 
@@ -278,7 +295,6 @@ export const BuyProductDialog = ({
                   : 'border-theme-400/30 bg-theme-400/5 hover:border-theme-400/50 hover:bg-theme-400/8'
               )}
             >
-              {/* Glow interno */}
               <div
                 aria-hidden
                 className='pointer-events-none absolute inset-0'
@@ -302,7 +318,7 @@ export const BuyProductDialog = ({
 
               {/* Badge */}
               <span className='mb-3 inline-flex items-center gap-1.5 rounded-full border border-theme-400/25 bg-theme-400/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-theme-400'>
-                ⚡ Oferta especial
+                {t('special_offer')}
               </span>
 
               <div className='flex items-start justify-between gap-6 pr-8 max-md:flex-col max-md:gap-3'>
@@ -343,12 +359,12 @@ export const BuyProductDialog = ({
           {/* ── Right: Summary ── */}
           <div className='w-full p-8 max-lg:border-t max-lg:border-white/5 max-lg:p-5 lg:w-80 lg:shrink-0 lg:overflow-y-auto xl:w-96'>
             <div>
-              <h3 className='font-sora text-base font-bold text-white'>Resumo da compra</h3>
+              <h3 className='font-sora text-base font-bold text-white'>{t('summary_title')}</h3>
 
               {/* Plan card */}
               <div className='mt-3 rounded-xl border border-white/8 bg-theme-700/40 p-4'>
                 <p className='text-[10px] font-bold uppercase tracking-widest text-neutral-500'>
-                  Plano selecionado
+                  {t('selected_plan')}
                 </p>
                 <p className='mt-1 font-semibold text-white'>{selectedPlan.name}</p>
 
@@ -359,7 +375,9 @@ export const BuyProductDialog = ({
                       .map(([key]) => (
                         <li key={key} className='flex items-center gap-2'>
                           <CheckCircle className='h-3 w-3 shrink-0 text-theme-400' />
-                          <span className='text-xs text-neutral-400'>{key}</span>
+                          <span className='text-xs text-neutral-400'>
+                            {featureDisplayName[key] ?? key}
+                          </span>
                         </li>
                       ))}
                   </ul>
@@ -377,7 +395,7 @@ export const BuyProductDialog = ({
                 )}
 
                 <div className='mt-3 flex justify-between border-t border-white/5 pt-3'>
-                  <span className='text-xs text-neutral-500'>Subtotal</span>
+                  <span className='text-xs text-neutral-500'>{t('subtotal')}</span>
                   <span className='text-sm font-bold text-white'>
                     {selectedPlan.discounted_price.toLocaleString('pt-br', {
                       style: 'currency',
@@ -412,7 +430,7 @@ export const BuyProductDialog = ({
               <div className='mt-4 rounded-xl border border-theme-400/20 bg-theme-400/5 p-3'>
                 <label className='mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-theme-400'>
                   <Tag className='h-3.5 w-3.5' />
-                  Tem um cupom de desconto?
+                  {t('coupon_label')}
                 </label>
                 <input
                   type='text'
@@ -420,13 +438,13 @@ export const BuyProductDialog = ({
                   autoFocus={false}
                   className='w-full rounded-lg border border-theme-400/30 bg-theme-800/60 px-3 py-2.5 text-sm text-white placeholder-neutral-600 outline-none transition-colors focus:border-theme-400 focus:ring-1 focus:ring-theme-400/30'
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder='Digite seu cupom aqui'
+                  placeholder={t('coupon_placeholder')}
                 />
               </div>
 
               {/* Total */}
               <div className='mt-4 flex items-center justify-between rounded-xl border border-white/8 bg-theme-700/40 px-4 py-3'>
-                <span className='text-sm font-semibold text-neutral-300'>Total</span>
+                <span className='text-sm font-semibold text-neutral-300'>{t('total')}</span>
                 <span className='font-sora text-xl font-bold text-theme-400'>
                   {subTotal.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}
                 </span>
@@ -439,12 +457,12 @@ export const BuyProductDialog = ({
                   className='mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-theme-400 py-3 text-sm font-semibold text-theme-900 transition-colors hover:bg-theme-400/90'
                 >
                   <ShoppingCart className='h-4 w-4' />
-                  Adquirir produto
+                  {t('buy_button')}
                 </button>
               </DialogClose>
 
               <p className='mt-3 text-center text-xs text-neutral-600'>
-                Você será redirecionado para o WhatsApp
+                {t('whatsapp_redirect')}
               </p>
             </div>
           </div>

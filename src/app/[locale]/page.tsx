@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
 
-import { PageView } from '../lib/fbpixel';
+import { PageView } from '../../lib/fbpixel';
 import { Title } from '@/components/globals/site/Title';
 import { CallToAction } from '@/components/page/home/CallToAction';
 import { FreeAnalysisWidget } from '@/components/globals/site/FreeAnalysisWidget';
@@ -84,7 +84,8 @@ const jsonLd = {
             itemOffered: {
               '@type': 'Service',
               name: 'Pacote Pro Plus',
-              description: 'Otimização profissional completa com tweaks avançados de kernel e registro',
+              description:
+                'Otimização profissional completa com tweaks avançados de kernel e registro',
             },
           },
         ],

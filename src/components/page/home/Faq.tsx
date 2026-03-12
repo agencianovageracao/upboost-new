@@ -3,44 +3,21 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-const items = [
-  {
-    title: 'Como é realizado o processo de otimização do Windows?',
-    response:
-      'A otimização é realizada através de um aplicativo remoto, utilizando o AnyDesk.',
-  },
-  {
-    title: 'Como posso confiar na empresa Upboost?',
-    response:
-      'Contamos com mais de 4000 feedbacks positivos em nosso perfil nos destaques de clientes.',
-  },
-  {
-    title: 'É necessário pagar mensalmente?',
-    response:
-      'O pagamento é feito apenas uma vez. A otimização será removida apenas se você formatar a máquina.',
-  },
-  {
-    title: 'Preciso comprar um pacote para cada jogo que eu jogo?',
-    response:
-      'Não, os pacotes otimizam o Windows como um todo, beneficiando todos os seus jogos, trabalhos e a agilidade geral da máquina.',
-  },
-  {
-    title: 'A Upboost funciona em consoles?',
-    response:
-      'A mais recente inovação da Upboost para consoles chegou! Reduza até 5ms de delay no seu controle e eleve sua performance nos jogos!',
-  },
-  {
-    title: 'Quanto tempo demora o processo de otimização?',
-    response:
-      'O processo de otimização leva cerca de 10 a 20 minutos dependendo do pacote escolhido.',
-  },
-];
-
 export const Faq = () => {
+  const t = useTranslations('Faq');
   const [open, setOpen] = useState<number | null>(null);
+
+  const items = [
+    { title: t('q1'), response: t('a1') },
+    { title: t('q2'), response: t('a2') },
+    { title: t('q3'), response: t('a3') },
+    { title: t('q4'), response: t('a4') },
+    { title: t('q5'), response: t('a5') },
+  ];
 
   const toggle = (i: number) => setOpen(prev => (prev === i ? null : i));
 
@@ -57,10 +34,10 @@ export const Faq = () => {
           className='mb-12 text-center'
         >
           <h2 className='font-sora text-3xl font-bold max-lg:text-2xl'>
-            Perguntas <span className='text-theme-400'>frequentes</span>
+            {t('title_1')} <span className='text-theme-400'>{t('title_accent')}</span>
           </h2>
           <p className='mt-2 text-sm text-neutral-400'>
-            Perguntas que nossos clientes geralmente fazem
+            {t('subtitle')}
           </p>
         </motion.div>
 

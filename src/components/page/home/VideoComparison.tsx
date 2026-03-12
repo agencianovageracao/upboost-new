@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 // Callback ref: chamado sincronamente quando o elemento é montado no DOM.
 // Resolve o bug do React onde o atributo `muted` não é aplicado corretamente
@@ -20,6 +21,7 @@ function setupVideo(el: HTMLVideoElement | null) {
 }
 
 export const VideoComparison = () => {
+  const t = useTranslations('VideoComparison');
   const [sliderPosition, setSliderPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
@@ -54,10 +56,10 @@ export const VideoComparison = () => {
   return (
     <section className='container my-16 max-lg:my-10'>
       <h2 className='mb-2 text-center font-sora text-3xl font-bold max-lg:text-2xl max-sm:text-xl'>
-        Veja a <span className='text-theme-400'>diferença</span>
+        {t('title_1')} <span className='text-theme-400'>{t('title_accent')}</span>
       </h2>
       <p className='mb-8 text-center text-sm text-neutral-400'>
-        Arraste a linha para comparar com e sem a UPBOOST
+        {t('subtitle')}
       </p>
 
       <div
@@ -120,29 +122,14 @@ export const VideoComparison = () => {
 
         {/* Label — left */}
         <div className='absolute left-4 top-4 z-10 rounded-lg bg-theme-900/80 px-3 py-1.5 text-sm font-bold text-theme-400 backdrop-blur-sm'>
-          Com a UPBOOST
+          {t('label_on')}
         </div>
 
         {/* Label — right */}
         <div className='absolute right-4 top-4 z-10 rounded-lg bg-theme-900/80 px-3 py-1.5 text-sm text-neutral-300 backdrop-blur-sm'>
-          Sem a UPBOOST
+          {t('label_off')}
         </div>
 
-        {/* Stats — left */}
-        <div className='absolute bottom-4 left-4 z-10 rounded-lg bg-theme-900/80 px-3 py-2 backdrop-blur-sm'>
-          <p className='text-xs text-neutral-300'>Latência Estimada</p>
-          <p className='font-bold text-theme-400'>0-2ms</p>
-          <p className='mt-1 text-xs text-neutral-300'>FPS</p>
-          <p className='font-bold text-theme-400'>133 fps</p>
-        </div>
-
-        {/* Stats — right */}
-        <div className='absolute bottom-4 right-4 z-10 rounded-lg bg-theme-900/80 px-3 py-2 text-right backdrop-blur-sm'>
-          <p className='text-xs text-neutral-300'>Latência Estimada</p>
-          <p className='font-bold text-red-300'>18-20ms</p>
-          <p className='mt-1 text-xs text-neutral-300'>FPS</p>
-          <p className='font-bold text-red-300'>69 fps</p>
-        </div>
       </div>
     </section>
   );

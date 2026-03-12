@@ -5,7 +5,6 @@ import {
   Building,
   HomeIcon,
   Menu,
-  MessageCircle,
   PhoneCall,
   ShieldQuestion,
   ShoppingCart,
@@ -13,23 +12,99 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
+import { useRouter, usePathname } from '@/i18n/navigation';
 
-const navLinks = [
-  { label: 'Início', href: '/#inicio', icon: HomeIcon },
-  { label: 'Planos', href: '#planos', icon: ShoppingCart, accent: true },
-  { label: 'FAQ', href: '#faq', icon: ShieldQuestion },
-  { label: 'Sobre nós', href: '#sobrenos', icon: Building },
-];
+// ── Language Switcher ──────────────────────────────────────────────────────────
+
+const locales = [
+  { code: 'pt', label: 'PT', flag: '/images/flags/brazil.png' },
+  { code: 'en', label: 'EN', flag: '/images/flags/united-states.png' },
+] as const;
+
+const LocaleSwitcher = () => {
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
+
+  const current = locales.find((l) => l.code === locale) ?? locales[0];
+
+  const select = (code: string) => {
+    setOpen(false);
+    if (code === locale) return;
+    startTransition(() => {
+      router.replace(pathname, { locale: code as 'pt' | 'en' });
+    });
+  };
+
+  return (
+    <div className='relative'>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        disabled={isPending}
+        className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs font-semibold text-neutral-300 transition-all hover:border-white/20 hover:text-white disabled:opacity-50'
+        aria-label='Switch language'
+        aria-expanded={open}
+      >
+        <Image src={current.flag} alt={current.label} width={18} height={18} className='rounded-sm object-cover' />
+        <span>{current.label}</span>
+        <svg className={`h-3 w-3 text-neutral-600 transition-transform ${open ? 'rotate-180' : ''}`} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5'><path d='m6 9 6 6 6-6'/></svg>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <>
+            <div className='fixed inset-0 z-10' onClick={() => setOpen(false)} />
+            <motion.ul
+              initial={{ opacity: 0, y: -4, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -4, scale: 0.97 }}
+              transition={{ duration: 0.15 }}
+              className='absolute right-0 top-full z-20 mt-1.5 min-w-[110px] overflow-hidden rounded-xl border border-white/10 bg-theme-800 shadow-xl shadow-black/40'
+            >
+              {locales.map(({ code, label, flag }) => (
+                <li key={code}>
+                  <button
+                    onClick={() => select(code)}
+                    className={`flex w-full items-center gap-2.5 px-3 py-2.5 text-xs font-semibold transition-colors hover:bg-white/5 ${
+                      code === locale ? 'text-theme-400' : 'text-neutral-400 hover:text-white'
+                    }`}
+                  >
+                    <Image src={flag} alt={label} width={18} height={18} className='rounded-sm object-cover' />
+                    {label}
+                    {code === locale && <span className='ml-auto h-1.5 w-1.5 rounded-full bg-theme-400' />}
+                  </button>
+                </li>
+              ))}
+            </motion.ul>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 const WA_HREF =
   'https://api.whatsapp.com/send?phone=+556592952018&text=Ol%C3%A1%F0%9F%98%80!+Gostaria+de+saber+mais+sobre+a+UPBOOST%2C+como+funcionam+os+planos+para+mais+desempenho+na+minha+m%C3%A1quina%3F';
 
 export const Navbar = () => {
+  const t = useTranslations('Navbar');
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const close = () => setIsOpen(false);
+
+  const navLinks = [
+    { label: t('home'), href: '/#inicio', icon: HomeIcon },
+    { label: t('plans'), href: '#planos', icon: ShoppingCart, accent: true },
+    { label: t('faq'), href: '#faq', icon: ShieldQuestion },
+    { label: t('about'), href: '#sobrenos', icon: Building },
+  ];
 
   const scrollTo = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     const hash = href.includes('#') ? href.split('#')[1] : null;
@@ -48,7 +123,6 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Prevent body scroll when drawer is open
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => {
@@ -109,19 +183,22 @@ export const Navbar = () => {
               ))}
             </ul>
 
-            <Link
-              href={WA_HREF}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='flex shrink-0 items-center gap-2 rounded-xl border border-theme-400/30 bg-theme-400/10 px-5 py-2.5 text-sm font-semibold text-theme-400 transition-all hover:border-theme-400/55 hover:bg-theme-400/15'
-            >
-              <PhoneCall className='h-3.5 w-3.5' />
-              Fale conosco
-            </Link>
+            <div className='flex items-center gap-3'>
+              <LocaleSwitcher />
+              <Link
+                href={WA_HREF}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='flex shrink-0 items-center gap-2 rounded-xl border border-theme-400/30 bg-theme-400/10 px-5 py-2.5 text-sm font-semibold text-theme-400 transition-all hover:border-theme-400/55 hover:bg-theme-400/15'
+              >
+                <PhoneCall className='h-3.5 w-3.5' />
+                {t('cta')}
+              </Link>
+            </div>
           </div>
         </div>
 
-        {/* Mobile top bar — always has a base glass bg for readability */}
+        {/* Mobile top bar */}
         <div
           className={`lg:hidden ${!scrolled ? 'border-b border-white/5 bg-theme-900/80 backdrop-blur-md' : ''}`}
         >
@@ -146,7 +223,7 @@ export const Navbar = () => {
             <button
               onClick={() => setIsOpen(true)}
               className='flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-theme-700/60 text-neutral-300 transition-colors hover:border-white/20 hover:text-white'
-              aria-label='Abrir menu'
+              aria-label={t('openMenu')}
             >
               <Menu className='h-[18px] w-[18px]' />
             </button>
@@ -154,7 +231,7 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* ── Mobile drawer (sibling of fixed bar, not inside it) ─ */}
+      {/* ── Mobile drawer ─────────────────────────────────── */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -214,7 +291,7 @@ export const Navbar = () => {
                 <button
                   onClick={close}
                   className='flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-theme-700/60 text-neutral-400 transition-colors hover:text-white'
-                  aria-label='Fechar menu'
+                  aria-label={t('closeMenu')}
                 >
                   <X className='h-4 w-4' />
                 </button>
@@ -240,7 +317,7 @@ export const Navbar = () => {
               </nav>
 
               {/* CTA */}
-              <div className='relative border-t border-white/5 p-4'>
+              <div className='relative flex flex-col gap-2 border-t border-white/5 p-4'>
                 <Link
                   href={WA_HREF}
                   target='_blank'
@@ -249,8 +326,11 @@ export const Navbar = () => {
                   className='flex w-full items-center justify-center gap-2 rounded-xl bg-theme-400 py-3 text-sm font-semibold text-theme-900 transition-colors hover:bg-theme-400/90'
                 >
                   <PhoneCall className='h-4 w-4' />
-                  Fale conosco
+                  {t('cta')}
                 </Link>
+                <div className='flex justify-center'>
+                  <LocaleSwitcher />
+                </div>
               </div>
             </motion.aside>
           </>
